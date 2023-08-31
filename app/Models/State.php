@@ -13,4 +13,8 @@ class State extends Model
     public function getStatesByCountryId($countryId){
         return State::where('country_id', $countryId)->orderBy('name', 'ASC')->get();
     }
+
+   /* public function getAllStates(){
+        return State::orderBy('')->get();
+    }*/
 }

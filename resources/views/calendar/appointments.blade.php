@@ -200,6 +200,7 @@
                                                     @endif
                                                 </td>
                                                 <td>
+
                                                     <div class="btn-group">
                                                         <i class="bx bx-dots-vertical dropdown-toggle text-warning" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;"></i>
                                                         <div class="dropdown-menu">
@@ -224,8 +225,8 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header" >
+                    <h6 class="modal-title text-uppercase" id="myModalLabel2">Add New Appointment</h6>
                     <button type="button" style="margin: 0px; padding: 0px;" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    <h4 class="modal-title" id="myModalLabel2">Add An Event</h4>
                 </div>
 
                 <div class="modal-body">

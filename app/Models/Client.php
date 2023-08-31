@@ -44,10 +44,11 @@ class Client extends Model
         $client->org_id = Auth::user()->org_id;
         $client->client_group_id = $request->clientGroup;
         $client->first_name = $request->firstName;
-        $client->last_name = $request->lastName;
-        $client->email = $request->email;
+        $client->last_name = $request->lastName ?? '';
+        $client->email = $request->email ?? 'info@placeholder.com';
         $client->mobile_no = $request->mobileNo;
         $client->slug = Str::slug($request->firstName).'-'.Str::random(8);
+        $client->created_at = $request->date ?? now();
         $client->save();
         return $client;
     }
@@ -78,7 +79,7 @@ class Client extends Model
     }
 
     public function getClients(){
-        return Client::orderBy('first_name', 'ASC')->get();
+        return Client::orderBy('created_at', 'DESC')->get();
     }
     public function getAllMyClients($authorId, $orgId){
         return Client::where('added_by', $authorId)->where('org_id', $orgId)->orderBy('first_name', 'ASC')->get();

@@ -11,6 +11,11 @@ use Illuminate\Support\Str;
 
 class Medication extends Model
 {
+    /*
+     *
+     * In this dispensation, Medication Model is used for follow-up or as Follow-up Model.
+     * This should be noted.
+     */
     use HasFactory;
 
    public function getPrescribedBy(){
@@ -29,8 +34,8 @@ class Medication extends Model
         $medication->drug_name = $request->drugName;
         $medication->prescription = $request->prescription;
         $medication->start_date = $request->startDate;
-        $medication->end_date = $request->endDate;
-        $medication->quantity = $request->quantity ?? 0;
+        $medication->end_date = now();
+        $medication->quantity = 0;
         $medication->slug = Str::random(11);
         $medication->save();
         return $medication;
@@ -44,8 +49,8 @@ class Medication extends Model
         $medication->drug_name = $request->drugName;
         $medication->prescription = $request->prescription;
         $medication->start_date = $request->startDate;
-        $medication->end_date = $request->endDate;
-        $medication->quantity = $request->quantity ?? 0;
+        $medication->end_date = now();
+        $medication->quantity =  0;
         //$medication->slug = Str::random(11);
         $medication->save();
         return $medication;

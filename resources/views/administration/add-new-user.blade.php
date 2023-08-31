@@ -3,7 +3,7 @@
     Add New User
 @endsection
 @section('extra-styles')
-
+    <link href="/assets/libs/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
 @endsection
 @section('breadcrumb-action-btn')
 
@@ -39,7 +39,7 @@
             <div class="col-xl-12 col-md-12">
                 <div class="card">
                     <div class="card-header d-flex justify-content-end">
-                        <a href="javascript:void(0);"  class="btn btn-primary  mb-3"><i class="bx bx-food-menu"></i> Manage Users  </a>
+                        <a href="{{ url()->previous() }}"  class="btn btn-secondary  mb-3"><i class="bx bx-arrow-back"></i> Go Back  </a>
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -227,7 +227,8 @@
 
 @section('extra-scripts')
 
-
+    <script src="/assets/libs/select2/js/select2.min.js"></script>
+    <script src="/assets/js/pages/form-advanced.init.js"></script>
     <script>
         $(document).ready(function(){
             $('#addNewUser').parsley().on('field:validated', function() {

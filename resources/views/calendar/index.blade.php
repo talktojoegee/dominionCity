@@ -162,8 +162,8 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header" >
+                    <h6 class="modal-title text-uppercase" id="myModalLabel2">Add To Calendar</h6>
                     <button type="button" style="margin: 0px; padding: 0px;" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    <h4 class="modal-title" id="myModalLabel2">Add To Calendar</h4>
                 </div>
                 <div class="modal-body">
                     <div class="card">

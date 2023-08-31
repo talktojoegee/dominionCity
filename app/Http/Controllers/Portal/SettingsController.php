@@ -2,14 +2,21 @@
 
 namespace App\Http\Controllers\Portal;
 
+use Spatie\Permission\Models\Role as SRole;
+//use Spatie\Permission\Models\Permission as SPermission;
+
 use App\Http\Controllers\Controller;
 use App\Models\AppointmentSetting;
 use App\Models\AppointmentType;
 use App\Models\ChurchBranch;
 use App\Models\Country;
 use App\Models\Location;
+use App\Models\ModuleManager;
 use App\Models\Organization;
+use App\Models\Permission;
 use App\Models\Region;
+use App\Models\Role;
+use App\Models\State;
 use App\Models\User;
 use App\Models\UserNotificationSetting;
 use Illuminate\Http\Request;
@@ -29,6 +36,10 @@ class SettingsController extends Controller
         $this->organization = new Organization();
         $this->churchbranch = new ChurchBranch();
         $this->region = new Region();
+        $this->state = new State();
+        $this->modulemanager = new ModuleManager();
+        $this->permission = new Permission();
+        $this->role = new Role();
     }
 
     public function showSettingsView(){
@@ -250,10 +261,12 @@ class SettingsController extends Controller
     }
 
     public function showBranchesSettingsView(){
+        $countryId = env('COUNTRY_ID') ?? 1;
         return view('settings.settings-branches',[
             'countries'=>$this->country->getCountries(),
             'branches'=>$this->churchbranch->getAllChurchBranches(),
-            'regions'=>$this->region->getRegions()
+            'regions'=>$this->region->getRegions(),
+            'states'=>$this->state->getStatesByCountryId($countryId)
         ]);
     }
 
@@ -308,6 +321,139 @@ class SettingsController extends Controller
         }
 
 
+    }
+
+
+    public function managePermissions(){
+        return view('settings.settings-permissions',[
+            'modules'=>$this->modulemanager->getModulesByArea(0),
+            'permissions'=>$this->permission->getPermissions(),
+        ]);
+    }
+
+
+    public function manageRoles(){
+        return view('settings.settings-roles',[
+            'roles'=>$this->role->getRoles(),
+            'permissions'=>$this->permission->getPermissions(),
+        ]);
+    }
+
+    public function storeRole(Request $request){
+        $all = isset($request->grantAll) ? 1 : 0;
+        if($all == 0){
+            $this->validate($request,[
+                'name'=>'required|unique:roles,name',
+                'permission'=>'required|array',
+                'permission.*'=>'required',
+            ],[
+                'name.required'=>'Enter role name',
+                'name.unique'=>'Role name already taken',
+                'permission.required'=>'Assign at least one permission to this role.',
+            ]);
+        }else{
+            $this->validate($request,[
+                'name'=>'required|unique:roles,name',
+            ],[
+                'name.required'=>'Enter role name',
+                'name.unique'=>'Role name already taken',
+            ]);
+        }
+        try {
+            if($all == 0){
+                $role = SRole::create([
+                    'name'=>$request->name,
+                    'guard_name'=>'web'
+                ]);// $this->role->addRole($request);
+                $role->syncPermissions($request->permission);
+            }else{
+                $permissions = $this->permission->getPermissions()->pluck('id');
+                $role = SRole::create([
+                    'name'=>$request->name,
+                    'guard_name'=>'web'
+                ]);// $this->role->addRole($request);
+                $role->syncPermissions($permissions);
+            }
+            session()->flash("success", "Action successful.");
+            return back();
+        }catch (\Exception $exception){
+            session()->flash("error", "Something went wrong. Try again later");
+            return back();
+        }
+
+    }
+
+
+    public function updateRolePermissions(Request $request){
+        $this->validate($request,[
+            'roleId'=>'required'
+        ]);
+        $role = SRole::findById($request->roleId);
+        if(!empty($role)){
+            $permissionIds = [];
+            foreach($request->permission as $permit){
+                array_push($permissionIds, $permit);
+            }
+            $permissions = $this->permission->getPermissionsByIds($permissionIds);
+            //return dd($permissions);
+            $role->syncPermissions($permissions);
+            session()->flash("success", "Action successful.");
+            return back();
+        }else{
+            session()->flash("error", "Something went wrong. Try again later");
+            return back();
+        }
+    }
+
+    public function storePermission(Request $request){
+        $this->validate($request,[
+            'permissionName'=>'required',
+            'module'=>'required'
+        ],[
+            'permissionName.required'=>'Enter permission name',
+            'module.required'=>'Choose the associate module',
+        ]);
+        $this->permission->addPermission($request);
+        session()->flash("success", "Action successful");
+        return back();
+    }
+    public function editPermission(Request $request){
+        $this->validate($request,[
+            'permissionName'=>'required',
+            'module'=>'required',
+            'permissionId'=>'required',
+        ],[
+            'permissionName.required'=>'Enter permission name',
+            'module.required'=>'Choose the associate module',
+        ]);
+        $this->permission->editPermission($request);
+        session()->flash("success", "Your changes were saved.");
+        return back();
+    }
+
+    public function saveLogo(Request $request){
+        $this->validate($request,[
+            'logo' => 'required|image|max:1024|mimes:jpg,png,jpeg',
+        ],[
+            "logo.required"=>"Choose a logo to upload",
+            "logo.image"=>"Choose an image file",
+            "logo.mimes"=>"Unsupported file format chosen",
+        ]);
+        $this->organization->uploadLogo($request->logo);
+        session()->flash("success", "Your logo was uploaded.");
+        return back();
+    }
+    public function saveFavicon(Request $request){
+        $this->validate($request, [
+            'favicon' => 'required|image|max:1024|mimes:jpg,png,jpeg',
+        ],[
+            "favicon.required"=>"Choose a favicon to upload",
+            "favicon.image"=>"Choose an image file",
+            "favicon.mimes"=>"Unsupported file format chosen",
+        ]);
+        $this->organization->uploadFavicon($request->favicon);
+        session()->flash("success", "Your favicon was uploaded.");
+        return back();
     }
 
 }

@@ -7,6 +7,7 @@ use App\Models\Country;
 use App\Models\MaritalStatus;
 use App\Models\ModuleManager;
 use App\Models\Role;
+use Spatie\Permission\Models\Role as SRole;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -49,7 +50,8 @@ class UserController extends Controller
         if(!empty($user)){
             return view('administration.profile',[
                 'user'=>$user,
-                'modules'=>$this->modulemanager->getModules()
+                'modules'=>$this->modulemanager->getModules(),
+                'roles'=>$this->role->getRoles()
             ]);
         }else{
             return back();
@@ -57,7 +59,6 @@ class UserController extends Controller
     }
 
     public function addNewUser(Request $request){
-        //return dd($request->all());
         $this->validate($request,[
             "firstName"=>"required",
             "lastName"=>"required",
@@ -87,11 +88,44 @@ class UserController extends Controller
             "branch.required"=>"Assign this person to a branch",
             "role.required"=>"What role best fits this person?",
         ]);
-        $this->user->createUser($request);
-        $message = "You've successfully added a new  user to the system.";
-        session()->flash("success", $message);
-        return back();
+        try {
+            $user = $this->user->createUser($request);
+            $role = $this->role->getRoleById($request->role);
+            if(!empty($role)){
+                $user->assignRole($role->name);
+            }
+            $message = "You've successfully added a new  user to the system.";
+            session()->flash("success", $message);
+            return back();
+        }catch (\Exception $exception){
+            session()->flash("error", 'Whoops! Something went wrong. Try again later.');
+            return back();
+        }
+
     }
+
+    public function assignRevokeRole(Request $request){
+        $this->validate($request, [
+            'role'=>'required',
+            'userId'=>'required',
+            //'action'=>'required', //1 for assignment, 2= for revoke
+        ],[
+            'role.required'=>'Choose role to assign',
+            'userId.required'=>''
+        ]);
+        $role = SRole::findById($request->role, 'web');
+        $user = $this->user->getUserById($request->userId);
+        if(!empty($role) && !empty($user)){
+            $user->syncRoles([$role->name]);
+            session()->flash("success", "Action successful!");
+            return back();
+        }else{
+            session()->flash("error", "Whoops! Something went wrong. Try again later.");
+            return back();
+        }
+
+    }
+
 
     public function deleteUser(Request $request){
         $this->validate($request,[

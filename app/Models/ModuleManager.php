@@ -34,5 +34,9 @@ class ModuleManager extends Model
         return ModuleManager::orderBy('module_name', 'ASC')->get();
     }
 
+    public function getModulesByArea($area){
+        return ModuleManager::where('area', $area)->orderBy('module_name', 'ASC')->get();
+    }
+
 
 }

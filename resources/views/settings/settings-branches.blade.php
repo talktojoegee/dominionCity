@@ -110,12 +110,12 @@
                                                                     </select>
                                                                 </div>
                                                                 <div class="form-group mt-3" id="stateWrapper_{{$branch->cb_id}}">
-                                                                    @if(!empty($branch->getState))
                                                                         <label for="">State<span class="text-danger">*</span></label> <br>
                                                                         <select name="state"  class="form-control ">
-                                                                            <option value="{{$branch->getState->id}}" selected>{{$branch->getState->name ?? ''}}</option>
+                                                                            @foreach($states as $state)
+                                                                                <option value="{{ $state->id }}" {{$branch->getState->id == $state->id ? 'selected' : '' }} >{{$state->name ?? ''}}</option>
+                                                                            @endforeach
                                                                         </select>
-                                                                    @endif
                                                                 </div>
                                                                 <div class="form-group mt-3">
                                                                     <label for="">Branch Name <span class="text-danger">*</span></label>

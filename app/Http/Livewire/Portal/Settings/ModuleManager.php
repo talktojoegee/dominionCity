@@ -39,4 +39,6 @@ class ModuleManager extends Component
             ->extends('layouts.master-layout')
             ->section('main-content');
     }
+
+
 }

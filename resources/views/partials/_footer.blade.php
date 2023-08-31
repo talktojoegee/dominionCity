@@ -6,7 +6,7 @@
             </div>
             <div class="col-sm-6">
                 <div class="text-sm-end d-none d-sm-block">
-                    Powered by: <a href="">{{config('app.name')}}</a>
+                    Powered by: <a href="">{{env('POWERED_BY')}}</a>
                 </div>
             </div>
         </div>

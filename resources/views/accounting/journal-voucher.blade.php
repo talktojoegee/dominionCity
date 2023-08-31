@@ -46,7 +46,7 @@
                 <div class="col-md-12 col-sm-12 mt-4">
                     <div class="d-flex justify-content-between modal-header">
                         <div class="h6 text-left pl-5 text-uppercase text-primary"> Journal Voucher Entry</div>
-                        <a href="{{route('chart-of-accounts')}}" class="btn btn-primary mr-3" > <i class="bx bxs-paper-plane"></i>  Journal Voucher Posting</a>
+                        <a href="{{route('accounting.chart-of-accounts')}}" class="btn btn-primary mr-3" > <i class="bx bxs-paper-plane"></i>  Journal Voucher Posting</a>
                     </div>
 
                     <div class="container pb-5 mt-5">

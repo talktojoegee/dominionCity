@@ -21,29 +21,30 @@ class Organization extends Component
     }
 
     public function saveOrganizationSettings(){
+
         $validatedData = $this->validate([
            'organizationName'=>'required',
            'organizationCode'=>'required|unique:organizations,organization_code,'.Auth::user()->org_id,
-           'taxIDType'=>'required',
-           'organizationTaxIDNumber'=>'required',
+           //'taxIDType'=>'required',
+           //'organizationTaxIDNumber'=>'required',
            'organizationPhoneNumber'=>'required',
            'organizationEmail'=>'required|email',
            'addressLine'=>'required',
            'city'=>'required',
            'state'=>'required',
            'country'=>'required',
-           'zipCode'=>'required',
+           //'zipCode'=>'required',
         ],[
-            "organizationName.required"=>"Enter organization name",
-            "organizationCode.required"=>"Enter organization code",
-            "organizationCode.unique"=>"This organization code is already taken.",
-            "organizationEmail.required"=>"Enter organization email address",
+            "organizationName.required"=>"Enter church name",
+            "organizationCode.required"=>"Enter CAC RC. Number",
+            "organizationCode.unique"=>"This CAC RC. Number is already taken.",
+            "organizationEmail.required"=>"Enter church email address",
             "organizationEmail.email"=>"Enter a valid email address",
-            "organizationPhoneNumber.required"=>"Enter organization phone number",
-            "addressLine.required"=>"Where's your organization located?",
-            "city.required"=>"In which city is your organization situated?",
-            "country.required"=>"In which country is your organization situated?",
-            "zipCode.required"=>"Enter your zip code",
+            "organizationPhoneNumber.required"=>"Enter  phone number",
+            "addressLine.required"=>"Where's the church located?",
+            "city.required"=>"In which city is the church situated?",
+            "country.required"=>"In which country is the church situated?",
+            //"zipCode.required"=>"Enter your postal code",
             "state.required"=>"Choose state",
         ]);
         $org = $this->organization->getUserOrganization(Auth::user()->org_id);

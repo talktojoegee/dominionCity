@@ -17,7 +17,7 @@
                         <img src="/assets/images/logo-light.svg" alt="" height="22">
                     </span>
                     <span class="logo-lg">
-                        <img src="{{asset('assets/images/logos/dc-logo.png')}}" alt="" height="64" width="90">
+                        <img src="{{asset('assets/images/'.Auth::user()->getUserOrganization->logo)}}" alt="" height="64" width="90">
                     </span>
                 </a>
             </div>
@@ -111,8 +111,6 @@
                 </button>
                 <div class="dropdown-menu dropdown-menu-end">
                     <a class="dropdown-item" href="{{route('settings')}}"><i class="bx bx-user font-size-16 align-middle me-1"></i> <span key="t-profile">Account Settings</span></a>
-                    <a class="dropdown-item" href="{{route('organization')}}"><i class="bx bx-briefcase-alt-2 font-size-16 align-middle me-1"></i> <span key="t-my-wallet">Organization</span></a>
-                    <a class="dropdown-item" href="{{route('purchase-or-upgrade-plan')}}"><i class="bx bx-card font-size-16 align-middle me-1"></i> <span key="t-lock-screen">Purchase/Upgrade Plan</span></a>
                     <a class="dropdown-item" href="{{route('change-password')}}"><i class="bx bx-lock-alt font-size-16 align-middle me-1"></i> <span key="t-lock-screen">Change Password</span></a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item text-danger" href="{{route('logout')}}">

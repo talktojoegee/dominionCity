@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
 use App\Models\Calendar;
+use App\Models\CashBook;
 use App\Models\Client;
+use App\Models\Remittance;
 use App\Models\Sale;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -20,6 +22,10 @@ class ReportsController extends Controller
         $this->sale = new Sale();
         $this->user = new User();
         $this->client = new Client();
+
+
+        $this->cashbook = new CashBook();
+        $this->remittance = new Remittance();
 
     }
 
@@ -283,5 +289,136 @@ class ReportsController extends Controller
                 'to.date'=>'Enter a valid date format',
             ]);
         }
+    }
+
+
+
+    public function showCashbookReport($type){
+        if(empty($type)){
+            session()->flash('error', "Something went wrong. Try again later.");
+            return back();
+        }
+
+        $from = date('Y-m-d', strtotime("-30 days"));
+        $to = date('Y-m-d');
+        switch ($type){
+            case 'cashbook':
+                return view('reports.cashbook.index',[
+                    'defaultCurrency'=>$this->cashbook->getDefaultCurrency(),
+                    'search'=>0,
+                    'from'=>$from,
+                    'to'=>$to,
+
+                ]);
+            case 'income':
+                return view('reports.income.index',[
+                    'defaultCurrency'=>$this->cashbook->getDefaultCurrency(),
+                    'search'=>0,
+                    'from'=>$from,
+                    'to'=>$to,
+
+                ]);
+            case 'expense':
+                return view('reports.expense.index',[
+                    'defaultCurrency'=>$this->cashbook->getDefaultCurrency(),
+                    'search'=>0,
+                    'from'=>$from,
+                    'to'=>$to,
+
+                ]);
+            default:
+                abort(404);
+        }
+
+    }
+
+    public function generateCashbookReport(Request $request){
+        $branchId = Auth::user()->branch;
+        $this->validate($request,[
+            'from'=>'required|date',
+            'to'=>'required|date',
+            'type'=>'required'
+        ],[
+            'from.required'=>'Choose start date',
+            'from.date'=>'Enter a valid date',
+            'to.date'=>'Enter a valid date',
+            'to.required'=>'Choose end date',
+            'type.required'=>'Something is missing. Contact admin'
+        ]);
+        $from = $request->from;
+        $to = $request->to;
+        switch ($request->type){
+            case 'cashbook':
+                return view('reports.cashbook.index',[
+                    'transactions'=>$this->cashbook->getCashbookTransactionsByDateRange($from, $to, $branchId),
+                    //'fxTransactions'=>$this->cashbook->getCashbookFXTransactionsByDateRange($from, $to, $branchId),
+                    'defaultCurrency'=>$this->cashbook->getDefaultCurrency(),
+                    'search'=>1,
+                    'from'=>$from,
+                    'to'=>$to,
+                    'balance'=>0
+
+                ]);
+            case 'income':
+                return view('reports.income.index',[
+                    'transactions'=>$this->cashbook->getCashbookTransactionsByDateRange($from, $to, $branchId),
+                    'defaultCurrency'=>$this->cashbook->getDefaultCurrency(),
+                    'search'=>1,
+                    'from'=>$from,
+                    'to'=>$to,
+                    'balance'=>0
+
+                ]);
+            case 'expense':
+                return view('reports.expense.index',[
+                    'transactions'=>$this->cashbook->getCashbookTransactionsByDateRange($from, $to, $branchId),
+                    //'fxTransactions'=>$this->cashbook->getCashbookFXTransactionsByDateRange($from, $to, $branchId),
+                    'defaultCurrency'=>$this->cashbook->getDefaultCurrency(),
+                    'search'=>1,
+                    'from'=>$from,
+                    'to'=>$to,
+                    'balance'=>0
+
+                ]);
+            default:
+                abort(404);
+        }
+
+    }
+
+
+    public function showRemittanceReport(){
+        $from = date('Y-m-d', strtotime("-30 days"));
+        $to = date('Y-m-d');
+        return view('reports.remittance.index',
+            [
+                'defaultCurrency'=>$this->cashbook->getDefaultCurrency(),
+                'search'=>0,
+                'from'=>$from,
+                'to'=>$to,
+            ]);
+    }
+
+    public function generateRemittanceReport(Request $request){
+        $branchId = Auth::user()->branch;
+        $this->validate($request,[
+            'from'=>'required|date',
+            'to'=>'required|date',
+        ],[
+            'from.required'=>'Choose start date',
+            'from.date'=>'Enter a valid date',
+            'to.date'=>'Enter a valid date',
+            'to.required'=>'Choose end date',
+        ]);
+        $from = $request->from;
+        $to = $request->to;
+        return view('reports.remittance.index',[
+            'transactions'=>$this->remittance->getRemittanceRecordByDateRange($from, $to, $branchId),
+            'defaultCurrency'=>$this->cashbook->getDefaultCurrency(),
+            'search'=>1,
+            'from'=>$from,
+            'to'=>$to,
+
+        ]);
     }
 }

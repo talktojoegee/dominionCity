@@ -24,41 +24,41 @@ class MedicationController extends Controller
         $this->validate($request,[
            "drugName"=>"required",
            "startDate"=>"required|date",
-           "endDate"=>"required|required",
+           //"endDate"=>"required|required",
             "clientId"=>"required",
             "prescription"=>"required"
         ],[
-            "drugName.required"=>"Enter drug name",
-            "startDate.required"=>"When should this person start this medication?",
-            "endDate.required"=>"Alright, when is the medication expected to end?",
+            "drugName.required"=>"What's the subject of your discussion?",
+            "startDate.required"=>"When did this conversation or follow-up take place?",
+            //"endDate.required"=>"Alright, when is the medication expected to end?",
             "startDate.date"=>"Enter a valid date format",
-            "endDate.date"=>"Enter a valid date format",
-            "prescription.required"=>"Enter prescription in the box provided."
+            //"endDate.date"=>"Enter a valid date format",
+            "prescription.required"=>"Enter details in the box provided."
         ]);
         $this->medication->addMedication($request);
-        $log = Auth::user()->first_name.' '.Auth::user()->last_name.' add medication';
-        ActivityLog::registerActivity(Auth::user()->org_id, $request->clientId, Auth::user()->id, null, 'New medication', $log);
-        session()->flash("success", "Success! Medication saved.");
+        $log = Auth::user()->first_name.' '.Auth::user()->last_name.' recently followed up';
+        ActivityLog::registerActivity(Auth::user()->org_id, $request->clientId, Auth::user()->id, null, 'New follow-up', $log);
+        session()->flash("success", "Action successful!");
         return back();
     }
     public function editMedication(Request $request){
         $this->validate($request,[
            "drugName"=>"required",
            "startDate"=>"required|date",
-           "endDate"=>"required|required",
+           //"endDate"=>"required|required",
             "medicationId"=>"required",
             "prescription"=>"required"
         ],[
-            "drugName.required"=>"Enter drug name",
-            "startDate.required"=>"When should this person start this medication?",
-            "endDate.required"=>"Alright, when is the medication expected to end?",
+            "drugName.required"=>"What's the subject of your discussion?",
+            "startDate.required"=>"When did this conversation or follow-up take place?",
+            //"endDate.required"=>"Alright, when is the medication expected to end?",
             "startDate.date"=>"Enter a valid date format",
-            "endDate.date"=>"Enter a valid date format",
-            "prescription.required"=>"Enter prescription in the box provided."
+            //"endDate.date"=>"Enter a valid date format",
+            "prescription.required"=>"Enter details in the box provided."
         ]);
         $this->medication->editMedication($request);
-        $log = Auth::user()->first_name.' '.Auth::user()->last_name.' made some changes to client medication';
-        ActivityLog::registerActivity(Auth::user()->org_id, $request->clientId, Auth::user()->id, null, 'Changes to medication', $log);
+        $log = Auth::user()->first_name.' '.Auth::user()->last_name.' made some changes to user follow-up';
+        ActivityLog::registerActivity(Auth::user()->org_id, $request->clientId, Auth::user()->id, null, 'Changes to follow-up', $log);
         session()->flash("success", "Success! Your changes were saved.");
         return back();
     }

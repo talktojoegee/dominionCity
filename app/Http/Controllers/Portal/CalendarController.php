@@ -5,6 +5,7 @@ namespace App\Http\Controllers\portal;
 use App\Http\Controllers\Controller;
 use App\Jobs\HandleNotifications;
 use App\Models\AppointmentType;
+use App\Models\Attendance;
 use App\Models\Calendar;
 use App\Models\CalendarComment;
 use App\Models\CalendarInvitee;
@@ -34,6 +35,8 @@ class CalendarController extends Controller
         $this->calendarcomment = new CalendarComment();
         $this->room = new Room();
         $this->clientgroup = new ClientGroup();
+
+        $this->attendance = new Attendance();
 
     }
 
@@ -235,4 +238,55 @@ class CalendarController extends Controller
        dispatch(new HandleNotifications($event->note, 'You have a new calendar event.',
            $this->route_name, $this->route_param, $this->route_type, $this->user_id, $this->orgId));
    }
+
+
+
+   public function showAttendance(){
+       $branchId = Auth::user()->branch;
+        return view('attendance.index',[
+            'attendance'=>$this->attendance->getBranchCurrentYearAttendance($branchId),
+            'lastYear'=>$this->attendance->getBranchLastYearAttendance($branchId),
+            'currentMonth'=>$this->attendance->getBranchCurrentMonthAttendance($branchId),
+            'lastMonth'=>$this->attendance->getBranchLastMonthAttendance($branchId)
+        ]);
+   }
+
+   public function publishAttendance(Request $request){
+        $this->validate($request,[
+            'programName'=>'required',
+            'programDate'=>'required',
+        ],[
+            'programName.required'=>"Enter program name",
+            'programDate.required'=>"Enter program date",
+        ]);
+
+        $this->attendance->registerAttendance($request);
+        session()->flash("success", "Success! Attendance recorded.");
+        return back();
+   }
+   public function updateAttendance(Request $request){
+        $this->validate($request,[
+            'programName'=>'required',
+            'programDate'=>'required',
+            'attendanceId'=>'required'
+        ],[
+            'programName.required'=>"Enter program name",
+            'programDate.required'=>"Enter program date",
+            'attendanceId.required'=>''
+        ]);
+
+        $this->attendance->editAttendance($request);
+        session()->flash("success", "Success! Your changes were saved.");
+        return back();
+   }
+
+    public function getAttendanceChart(){
+
+        return response()->json([
+            'men'=>$this->attendance->getThisYearAttendanceStat('a_no_men'),
+            'women'=>$this->attendance->getThisYearAttendanceStat('a_no_women'),
+            'children'=>$this->attendance->getThisYearAttendanceStat('a_no_children'),
+        ],200);
+    }
+
 }

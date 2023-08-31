@@ -1,42 +1,26 @@
 <div class="main-settings__sidebar-container">
-    <div class="main-title">Settings</div>
-    <div class="sidebar-section">
+    <div class="modal-header">
+        <h6 class="modal-title text-uppercase">Settings</h6>
+    </div>
+    <div class="sidebar-section mt-5">
         <div class="settings-section-header">
-            <div class="section-title">General</div>
+            <div class="section-title text-uppercase">
+                <h6>Features</h6>
+            </div>
         </div>
-        <a href="{{route('settings')}}" class="{{  Request::routeIs('settings') ? 'is-active-setting' : ''}}">
+        <a href="{{route('organization')}}" class="{{  Request::routeIs('organization') ? 'is-active-setting' : ''}}">
             <div class="sidebar-item">
-                <span class="">Cells</span>
+                <span class="">Basic Settings</span>
             </div>
         </a>
-        <a href="{{route('settings')}}" class="{{  Request::routeIs('settings') ? 'is-active-setting' : ''}}">
+        <a href="{{route('settings')}}" class="{{  Request::routeIs('organization') ? 'is-active-setting' : ''}}">
             <div class="sidebar-item">
-                <span class="">Regions</span>
+                <span class="">General Settings</span>
             </div>
         </a>
         <a href="{{route('branches-settings')}}" class="{{  Request::routeIs('branches-settings') ? 'is-active-setting' : ''}}">
             <div class="sidebar-item">
-                <span class="">Branches</span>
-            </div>
-        </a>
-        <a href="{{route('settings')}}" class="{{  Request::routeIs('settings') ? 'is-active-setting' : ''}}">
-            <div class="sidebar-item">
-                <span class="">Workflow</span>
-            </div>
-        </a>
-        <a href="{{route('settings')}}" class="{{  Request::routeIs('settings') ? 'is-active-setting' : ''}}">
-            <div class="sidebar-item">
-                <span class="">Departments</span>
-            </div>
-        </a>
-        <a href="{{route('settings')}}" class="{{  Request::routeIs('settings') ? 'is-active-setting' : ''}}">
-            <div class="sidebar-item">
-                <span>Account</span>
-            </div>
-        </a>
-        <a href="{{route('notification-settings')}}" class=" {{  request()->routeIs('notification-settings') ? 'is-active-setting' : ''}}">
-            <div class="sidebar-item">
-                <span>Notifications</span>
+                <span class="">Branch Settings</span>
             </div>
         </a>
     </div>
@@ -55,11 +39,6 @@
         <a href="{{route('appointment-types-settings')}}" class=" {{  request()->routeIs('appointment-types-settings') ? 'is-active-setting' : ''}}">
             <div class="sidebar-item">
                 <span>Appointment Types</span>
-            </div>
-        </a>
-        <a href="{{route('appt-locations')}}" class=" {{  request()->routeIs('appt-locations') ? 'is-active-setting' : ''}}">
-            <div class="sidebar-item">
-                <span>Appt. Locations</span>
             </div>
         </a>
         <a href="{{route('change-password')}}" class=" {{  request()->routeIs('change-password') ? 'is-active-setting' : ''}}">

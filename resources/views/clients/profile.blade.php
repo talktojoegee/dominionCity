@@ -7,6 +7,7 @@
     <link href="/assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
     <link href="/assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
     <link href="/css/parsley.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
 @endsection
 @section('breadcrumb-action-btn')
 
@@ -26,7 +27,7 @@
     @endif
     <div class="card">
         <div class="card-header">
-            <a href="{{route('clients')}}"  class="btn btn-primary  mb-3">All Clients <i class="bx bxs-group"></i> </a>
+            <a href="{{route('clients')}}"  class="btn btn-primary  mb-3">All Users <i class="bx bxs-group"></i> </a>
         </div>
         <div class="row">
             <div class="col-xl-4">
@@ -35,8 +36,8 @@
                         <div class="row">
                             <div class="col-7">
                                 <div class="text-primary p-3">
-                                    <h5 class="text-primary">Client Details</h5>
-                                    <p>Explore client profile</p>
+                                    <h5 class="text-primary">User Details</h5>
+                                    <p>Explore user profile</p>
                                 </div>
                             </div>
                             <div class="col-5 align-self-end">
@@ -46,7 +47,7 @@
                     </div>
                     <div class="card-body pt-0">
                         <div class="row">
-                            <div class="col-sm-4">
+                            <div class="col-sm-12">
                                 <div class="avatar-md profile-user-wid mb-4" style="width: 120px; height: 120px;" >
                                     <img style="width: 120px; height: 120px;" src="{{url('storage/'.$client->avatar)}}" alt="" class="img-thumbnail rounded-circle">
                                 </div>
@@ -56,17 +57,6 @@
 
                             <div class="col-sm-8">
                                 <div class="pt-4">
-
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <h5 class="font-size-15">{{number_format($client->getClientAppointments->count())}}</h5>
-                                            <p class="text-muted mb-0">Appointments</p>
-                                        </div>
-                                        <div class="col-6">
-                                            <h5 class="font-size-15">{{number_format($files->count())}}</h5>
-                                            <p class="text-muted mb-0">Documents</p>
-                                        </div>
-                                    </div>
                                     <div class="mt-4">
                                         <a href="javascript: void(0);" data-bs-toggle="modal" data-bs-target="#editClientModal" class="btn btn-warning waves-effect waves-light btn-sm">Edit Profile <i class="bx bxs-pencil ms-1"></i></a>
                                     </div>
@@ -120,7 +110,7 @@
                                     <td colspan="2">
                                         <form action="{{route('assign-client-to')}}" method="post">
                                             @csrf
-                                            <h6 class="card-header bg-custom text-white mb-3">Assign Client To...</h6>
+                                            <h6 class="card-header bg-custom text-white mb-3">Assign User To...</h6>
                                             <div class="form-group">
                                                 <label for="">Practitioners & Admins</label>
                                                 <select name="assignTo" id="assignTo" class="form-control">
@@ -151,175 +141,37 @@
                         <!-- Nav tabs -->
                         <ul class="nav nav-tabs nav-tabs-custom nav-justified" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link active" data-bs-toggle="tab" href="#home1" role="tab">
+                                <a class="nav-link active" data-bs-toggle="tab" href="#medication" role="tab">
+                                    <span class="d-block d-sm-none"><i class="far fa-user"></i></span>
+                                    <span class="d-none d-sm-block">Follow-up</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#home1" role="tab">
                                     <span class="d-block d-sm-none"><i class="fas fa-home"></i></span>
-                                    <span class="d-none d-sm-block">Appointments</span>
+                                    <span class="d-none d-sm-block">Messaging</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#medication" role="tab">
-                                    <span class="d-block d-sm-none"><i class="far fa-user"></i></span>
-                                    <span class="d-none d-sm-block">Medication</span>
-                                </a>
-                            </li>
-                            <li class="nav-item" style="display: none;">
-                                <a class="nav-link" data-bs-toggle="tab" href="#profile1" role="tab">
-                                    <span class="d-block d-sm-none"><i class="far fa-user"></i></span>
-                                    <span class="d-none d-sm-block">Message</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#documents" role="tab">
-                                    <span class="d-block d-sm-none"><i class="far fa-envelope"></i></span>
-                                    <span class="d-none d-sm-block">Documents</span>
-                                </a>
-                            </li>
+
                         </ul>
 
                         <!-- Tab panes -->
                         <div class="tab-content p-3 text-muted">
-                            <div class="tab-pane active" id="home1" role="tabpanel">
-                                <div class="card-header bg-custom text-white mb-3">Appointments</div>
-                                <div class="table-responsive mt-3">
-                                    <table id="datatable" class="table table-bordered dt-responsive  nowrap w-100">
-                                        <thead>
-                                        <tr>
-                                            <th class="">#</th>
-                                            <th class="wd-15p">Date & Time</th>
-                                            <th class="wd-15p">Type</th>
-                                            <th class="wd-15p">Contact</th>
-                                            <th class="wd-15p">Status</th>
-                                            <th class="wd-15p">Action</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        @php $index = 1; @endphp
-                                        @foreach($client->getClientAppointments as $appoint)
-                                            <tr>
-                                                <td>{{$index++}}</td>
-                                                <td>
-                                                    @if($appoint->getCalendar->session_type != 3)
-                                                        {{date('d M, Y', strtotime($appoint->getCalendar->event_date))}} <u class="text-info">{{date('h:ia', strtotime($appoint->getCalendar->event_date))}}</u>
-                                                    @else
-                                                        <strong>From: </strong>{{date('d M, Y', strtotime($appoint->getCalendar->event_date))}} <u class="text-info">{{date('h:ia', strtotime($appoint->getCalendar->event_date))}}</u>
-                                                        <br>
-                                                        <strong>To: </strong>{{date('d M, Y', strtotime($appoint->getCalendar->end_date))}} <u class="text-info">{{date('h:ia', strtotime($appoint->getCalendar->end_date))}}</u>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    @if($appoint->getCalendar->session_type != 3)
-                                                        {{$appoint->getCalendar->getAppointmentType->name ?? '' }}
-                                                    @else
-                                                        <span class="text-warning">Block Session</span>
-                                                    @endif
 
-                                                </td>
-                                                <td>
-                                                    @if($appoint->getCalendar->session_type != 3)
-                                                        @switch($appoint->getCalendar->contact_type)
-                                                            @case(1)
-                                                            Video Call
-                                                            @break
-                                                            @case(2)
-                                                            In Person
-                                                            @break
-                                                            @case(3)
-                                                            Phone Call
-                                                            @break
-                                                        @endswitch
-                                                    @else
-                                                        <span class="text-warning">Block Session</span>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    @switch($appoint->getCalendar->status)
-                                                        @case(1)
-                                                        <label for="" class="badge badge-soft-primary">Booked</label>
-                                                        @break
-                                                        @case(2)
-                                                        <label for="" class="badge badge-soft-success">Confirmed</label>
-                                                        @break
-                                                        @case(3)
-                                                        <label for="" class="badge-soft-danger badge">Cancelled</label>
-                                                        @break
-                                                        @case(4)
-                                                        <label for="" class="badge badge-soft-warning">Repeat</label>
-                                                        @break
-                                                    @endswitch
-                                                </td>
-                                                <td>
-                                                    <div class="btn-group">
-                                                        <i class="bx bx-dots-vertical dropdown-toggle text-warning" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;"></i>
-                                                        <div class="dropdown-menu">
-                                                            <a class="dropdown-item" href="{{route('show-appointment-details', $appoint->getCalendar->slug)}}"> <i class="bx bxs-book-open"></i> View</a>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="tab-pane" id="profile1" role="tabpanel">
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#composeMessage">Compose Message <i class="bx bxs-pencil"></i> </button>
-                                <div class="card-header bg-custom text-white mb-3 mt-3">Messages</div>
-                                <div class="table-responsive mt-3">
-                                    <table id="datatable1" class="table table-bordered dt-responsive  nowrap w-100">
-                                        <thead>
-                                        <tr>
-                                            <th class="">#</th>
-                                            <th class="wd-15p">Drug Name</th>
-                                            <th class="wd-15p">Prescribed By</th>
-                                            <th class="wd-15p">Start Date</th>
-                                            <th class="wd-15p">Reports</th>
-                                            <th class="wd-15p">Action</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        @php $index = 1; @endphp
-                                        @foreach($client->getClientMedications as $med)
-                                            <tr>
-                                                <td>{{$index++}}</td>
-                                                <td>
-                                                    {{$med->drug_name ?? '' }}
-                                                </td>
-                                                <td>
-                                                    {{$med->getPrescribedBy->first_name ?? '' }}  {{$med->getPrescribedBy->last_name ?? '' }}
-
-                                                </td>
-                                                <td>
-                                                    {{date('d M, Y', strtotime($med->start_date))}}
-                                                </td>
-                                                <td>
-                                                    <span class="badge rounded-pill bg-success"> {{number_format($med->getClientMedicationReports->count())}} </span> <abbr title="Number of reports">?</abbr>
-                                                </td>
-                                                <td>
-                                                    <div class="btn-group">
-                                                        <i class="bx bx-dots-vertical dropdown-toggle text-warning" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;"></i>
-                                                        <div class="dropdown-menu">
-                                                            <a class="dropdown-item" href="{{route('medication-details', ['slug'=>$med->slug])}}"> <i class="bx bxs-book-open"></i> View Details</a>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="tab-pane" id="medication" role="tabpanel">
+                            <div class="tab-pane active" id="medication" role="tabpanel">
                                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMedication">Add New <i class="bx bxs-plus-circle"></i> </button>
-                                <div class="card-header bg-custom text-white mb-3 mt-3">Medications</div>
+                                <div class="modal-header bg-custom text-white mb-5 mt-3">
+                                    <h6 class="modal-title text-uppercase">Previous Records</h6>
+                                </div>
                                 <div class="table-responsive mt-3">
                                     <table id="datatable2" class="table table-bordered dt-responsive  nowrap w-100">
                                         <thead>
                                         <tr>
                                             <th class="">#</th>
-                                            <th class="wd-15p">Drug Name</th>
-                                            <th class="wd-15p">Prescribed By</th>
-                                            <th class="wd-15p">Start Date</th>
-                                            <th class="wd-15p">Reports</th>
+                                            <th class="wd-15p">Date</th>
+                                            <th class="wd-15p">Contacted By</th>
+                                            <th class="wd-15p">Title</th>
+                                            <th class="wd-15p">Feedback(s)</th>
                                             <th class="wd-15p">Action</th>
                                         </tr>
                                         </thead>
@@ -329,17 +181,18 @@
                                             <tr>
                                                 <td>{{$index++}}</td>
                                                 <td>
-                                                   {{$med->drug_name ?? '' }}
+                                                    {{date('d M, Y h:ia', strtotime($med->start_date))}}
                                                 </td>
                                                 <td>
                                                     {{$med->getPrescribedBy->first_name ?? '' }}  {{$med->getPrescribedBy->last_name ?? '' }}
 
                                                 </td>
                                                 <td>
-                                                   {{date('d M, Y', strtotime($med->start_date))}}
+                                                   {{$med->drug_name ?? '' }}
                                                 </td>
+
                                                 <td>
-                                                   <span class="badge rounded-pill bg-success"> {{number_format($med->getClientMedicationReports->count())}} </span> <abbr title="Number of reports">?</abbr>
+                                                   <span class="badge rounded-pill bg-success"> {{number_format($med->getClientMedicationReports->count())}} </span>
                                                 </td>
                                                 <td>
                                                     <div class="btn-group">
@@ -353,232 +206,6 @@
                                         @endforeach
                                         </tbody>
                                     </table>
-                                </div>
-                            </div>
-                            <div class="tab-pane" id="documents" role="tabpanel">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <div class="col-xl-12 col-md-12 col-lg-12">
-                                            <div class="card-header bg-custom text-white mb-3">Upload New Document(s)</div>
-                                            <p class="card-title-desc">Upload <strong>{{$client->first_name ?? '' }}'s</strong> documents here. Below are other documents previously uploaded relating to <strong>{{$client->first_name ?? '' }}</strong></p>
-                                            <div class="tab-content p-3 text-muted">
-                                                <div class="tab-pane active" id="home1" role="tabpanel">
-                                                    <form action="{{route('upload-files')}}" autocomplete="off" method="post" enctype="multipart/form-data">
-                                                        @csrf
-                                                        <div class="form-group mb-3">
-                                                            <label for="">File Name</label>
-                                                            <input type="text" name="fileName" placeholder="File Name" class="form-control">
-                                                            @error('fileName')
-                                                            <i class="text-danger mt-2">{{$message}}</i>
-                                                            @enderror
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="">Attachment</label>
-                                                            <input type="file" name="attachments[]" class="form-control-file" multiple>
-                                                            @error('attachment')
-                                                            <i class="text-danger mt-2">{{$message}}</i>
-                                                            @enderror
-                                                            <input type="hidden" name="folder" value="0">
-                                                            <input type="hidden" name="client" value="{{$client->id}}">
-                                                        </div>
-                                                        <hr>
-                                                        <div class="form-group d-flex justify-content-center">
-                                                            <div class="btn-group">
-                                                                <button type="submit" class="btn btn-custom"><i class="bx bx-cloud-upload mr-2"></i> Upload File(s)</button>
-                                                            </div>
-                                                        </div>
-                                                    </form>
-                                                    <div class="card-header bg-custom text-white mb-3 mt-3">{{$client->first_name ?? '' }}'s Documents</div>
-                                                    @foreach ($files as $file)
-                                                        @switch(pathinfo($file->filename, PATHINFO_EXTENSION))
-                                                            @case('pptx')
-                                                            <div class="col-md-2">
-                                                                <a href="javascript:void(0);" data-toggle="tooltip" data-placement="top" title="{{$file->name ?? 'No name'}}" data-original-title="{{$file->name ?? 'No name'}}" style="cursor: pointer;">
-                                                                    <img src="/assets/formats/ppt.png" height="64" width="64" alt="{{$file->name ?? 'No name'}}"><br>
-                                                                    {{strlen($file->name ?? 'No name') > 10 ? substr($file->name ?? 'No name',0,7).'...' : $file->name ?? 'No name'}}
-                                                                </a>
-                                                                @include('storage.partials._drop-menu')
-                                                            </div>
-
-                                                            @break
-                                                            @case('pdf')
-                                                            <div class="col-md-2 mb-4">
-                                                                <a href="javascript:void(0);" data-toggle="tooltip" data-placement="top" title="{{$file->name ?? 'No name'}}" data-original-title="{{$file->name ?? 'No name'}}" style="cursor: pointer;">
-                                                                    <img src="/assets/formats/pdf.png" height="64" width="64" alt="{{$file->name ?? 'No name'}}"> <br>
-                                                                    {{strlen($file->name ?? 'No name') > 10 ? substr($file->name ?? 'No name',0,7).'...' : $file->name ?? 'No name'}}
-                                                                </a>
-                                                                @include('storage.partials._drop-menu')
-                                                            </div>
-                                                            @break
-
-                                                            @case('csv')
-                                                            <div class="col-md-2">
-                                                                <a href="javascript:void(0);" style="cursor: pointer;"  data-toggle="tooltip" data-placement="top" title="{{$file->name ?? 'No name'}}" data-original-title="{{$file->name ?? 'No name'}}">
-                                                                    <img src="/assets/formats/csv.png" height="64" width="64" alt="{{$file->name ?? 'No name'}}"><br>
-                                                                    {{strlen($file->name ?? 'No name') > 10 ? substr($file->name ?? 'No name',0,7).'...' : $file->name ?? 'No name'}}
-                                                                </a>
-                                                                @include('storage.partials._drop-menu')
-                                                            </div>
-                                                            @break
-                                                            @case('xls')
-                                                            <div class="col-md-2">
-                                                                <a href="javascript:void(0);" style="cursor: pointer;"  data-toggle="tooltip" data-placement="top" title="{{$file->name ?? 'No name'}}" data-original-title="{{$file->name ?? 'No name'}}">
-                                                                    <img src="/assets/formats/xls.png" height="64" width="64" alt="{{$file->name ?? 'No name'}}"><br>
-                                                                    {{strlen($file->name ?? 'No name') > 10 ? substr($file->name ?? 'No name',0,7).'...' : $file->name ?? 'No name'}}
-                                                                </a>
-                                                                @include('storage.partials._drop-menu')
-                                                            </div>
-                                                            @break
-                                                            @case('xlsx')
-                                                            <div class="col-md-2">
-                                                                <a href="javascript:void(0);" style="cursor: pointer;"  data-toggle="tooltip" data-placement="top" title="{{$file->name ?? 'No name'}}" data-original-title="{{$file->name ?? 'No name'}}">
-                                                                    <img src="/assets/formats/xls.png" height="64" width="64" alt="{{$file->name ?? 'No name'}}"><br>
-                                                                    {{strlen($file->name ?? 'No name') > 10 ? substr($file->name ?? 'No name',0,7).'...' : $file->name ?? 'No name'}}
-                                                                </a>
-                                                                @include('storage.partials._drop-menu')
-                                                            </div>
-                                                            @break
-                                                            @case('doc')
-                                                            <div class="col-md-2">
-                                                                <a href="javascript:void(0);" style="cursor: pointer;"  data-toggle="tooltip" data-placement="top" title="{{$file->name ?? 'No name'}}" data-original-title="{{$file->name ?? 'No name'}}">
-                                                                    <img src="/assets/formats/doc.png" height="64" width="64" alt="{{$file->name ?? 'No name'}}"><br>
-                                                                    {{strlen($file->name ?? 'No name') > 10 ? substr($file->name ?? 'No name',0,7).'...' : $file->name ?? 'No name'}}
-                                                                </a>
-                                                                @include('storage.partials._drop-menu')
-                                                            </div>
-                                                            @break
-                                                            @case('doc')
-                                                            <div class="col-md-2">
-                                                                <a href="javascript:void(0);" style="cursor: pointer;" data-toggle="tooltip" data-placement="top" title="{{$file->name ?? 'No name'}}" data-original-title="{{$file->name ?? 'No name'}}">
-                                                                    <img src="/assets/formats/doc.png" height="64" width="64" alt="{{$file->name ?? 'No name'}}"><br>
-                                                                    {{strlen($file->name ?? 'No name') > 10 ? substr($file->name ?? 'No name',0,7).'...' : $file->name ?? 'No name'}}
-                                                                </a>
-                                                                @include('storage.partials._drop-menu')
-                                                            </div>
-                                                            @break
-                                                            @case('docx')
-                                                            <div class="col-md-2">
-                                                                <a href="javascript:void(0);" style="cursor: pointer;" data-toggle="tooltip" data-placement="top" title="{{$file->name ?? 'No name'}}" data-original-title="{{$file->name ?? 'No name'}}">
-                                                                    <img src="/assets/formats/doc.png" height="64" width="64" alt="{{$file->name ?? 'No name'}}"><br>
-                                                                    {{strlen($file->name ?? 'No name') > 10 ? substr($file->name ?? 'No name',0,7).'...' : $file->name ?? 'No name'}}
-                                                                </a>
-                                                                @include('storage.partials._drop-menu')
-                                                            </div>
-                                                            @break
-                                                            @case('jpeg')
-                                                            <div class="col-md-2">
-                                                                <a href="javascript:void(0);" style="cursor: pointer;"  data-toggle="tooltip" data-placement="top" title="{{$file->name ?? 'No name'}}" data-original-title="{{$file->name ?? 'No name'}}">
-                                                                    <img src="/assets/formats/jpg.png" height="64" width="64" alt="{{$file->name ?? 'No name'}}"><br>
-                                                                    {{strlen($file->name ?? 'No name') > 10 ? substr($file->name ?? 'No name',0,7).'...' : $file->name ?? 'No name'}}
-                                                                </a>
-                                                                @include('storage.partials._drop-menu')
-                                                            </div>
-                                                            @break
-                                                            @case('jpg')
-                                                            <div class="col-md-2">
-                                                                <a href="javascript:void(0);" style="cursor: pointer;"  data-toggle="tooltip" data-placement="top" title="{{$file->name ?? 'No name'}}" data-original-title="{{$file->name ?? 'No name'}}">
-                                                                    <img src="/assets/formats/jpg.png" height="64" width="64" alt="{{$file->name ?? 'No name'}}"><br>
-                                                                    {{strlen($file->name ?? 'No name') > 10 ? substr($file->name ?? 'No name',0,7).'...' : $file->name ?? 'No name'}}
-                                                                </a>
-                                                                @include('storage.partials._drop-menu')
-                                                            </div>
-                                                            @break
-                                                            @case('png')
-                                                            <div class="col-md-2">
-                                                                <a href="javascript:void(0);" style="cursor: pointer;"  data-toggle="tooltip" data-placement="top" title="{{$file->name ?? 'No name'}}" data-original-title="{{$file->name ?? 'No name'}}">
-                                                                    <img src="/assets/formats/png.png" height="64" width="64" alt="{{$file->name ?? 'No name'}}"><br>
-                                                                    {{strlen($file->name ?? 'No name') > 10 ? substr($file->name ?? 'No name',0,7).'...' : $file->name ?? 'No name'}}
-                                                                </a>
-                                                                @include('storage.partials._drop-menu')
-                                                            </div>
-                                                            @break
-                                                            @case('gif')
-                                                            <div class="col-md-2">
-                                                                <a href="javascript:void(0);" style="cursor: pointer;" data-toggle="tooltip" data-placement="top" title="{{$file->name ?? 'No name'}}" data-original-title="{{$file->name ?? 'No name'}}">
-                                                                    <img src="/assets/formats/gif.png" height="64" width="64" alt="{{$file->name ?? 'No name'}}"><br>
-                                                                    {{strlen($file->name ?? 'No name') > 10 ? substr($file->name ?? 'No name',0,7).'...' : $file->name ?? 'No name'}}
-                                                                </a>
-                                                                @include('storage.partials._drop-menu')
-                                                            </div>
-                                                            @break
-                                                            @case('ppt')
-                                                            <div class="col-md-2">
-                                                                <a href="javascript:void(0);" style="cursor: pointer;" data-toggle="tooltip" data-placement="top" title="{{$file->name ?? 'No name'}}" data-original-title="{{$file->name ?? 'No name'}}">
-                                                                    <img src="/assets/formats/ppt.png" height="64" width="64" alt="{{$file->name ?? 'No name'}}"><br>
-                                                                    {{strlen($file->name ?? 'No name') > 10 ? substr($file->name ?? 'No name',0,7).'...' : $file->name ?? 'No name'}}
-                                                                </a>
-                                                                @include('storage.partials._drop-menu')
-                                                            </div>
-                                                            @break
-                                                            @case('txt')
-                                                            <div class="col-md-2">
-                                                                <a href="javascript:void(0);" style="cursor: pointer;" data-toggle="tooltip" data-placement="top" title="{{$file->name ?? 'No name'}}" data-original-title="{{$file->name ?? 'No name'}}">
-                                                                    <img src="/assets/formats/txt.png" height="64" width="64" alt="{{$file->name ?? 'No name'}}"><br>
-                                                                    {{strlen($file->name ?? 'No name') > 10 ? substr($file->name ?? 'No name',0,7).'...' : $file->name ?? 'No name'}}
-                                                                </a>
-                                                                @include('storage.partials._drop-menu')
-                                                            </div>
-                                                            @break
-                                                            @case('css')
-                                                            <div class="col-md-2">
-                                                                <a href="javascript:void(0);" style="cursor: pointer;" data-toggle="tooltip" data-placement="top" title="{{$file->name ?? 'No name'}}" data-original-title="{{$file->name ?? 'No name'}}">
-                                                                    <img src="/assets/formats/css.png" height="64" width="64" alt="{{$file->name ?? 'No name'}}"> <br>
-                                                                    {{strlen($file->name ?? 'No name') > 10 ? substr($file->name ?? 'No name',0,7).'...' : $file->name ?? 'No name'}}
-                                                                </a>
-                                                                @include('storage.partials._drop-menu')
-                                                            </div>
-                                                            @break
-                                                            @case('mp3')
-                                                            <div class="col-md-2">
-                                                                <a href="javascript:void(0);" style="cursor: pointer;" data-toggle="tooltip" data-placement="top" title="{{$file->name ?? 'No name'}}" data-original-title="{{$file->name ?? 'No name'}}">
-                                                                    <img src="/assets/formats/mp3.png" height="64" width="64" alt=""><br>
-                                                                    {{strlen($file->name ?? 'No name') > 10 ? substr($file->name ?? 'No name',0,7).'...' : $file->name ?? 'No name'}}
-                                                                </a>
-                                                                @include('storage.partials._drop-menu')
-                                                            </div>
-                                                            @break
-                                                            @case('mp4')
-                                                            <div class="col-md-2">
-                                                                <a href="javascript:void(0);" style="cursor: pointer;" data-toggle="tooltip" data-placement="top" title="{{$file->name ?? 'No name'}}" data-original-title="{{$file->name ?? 'No name'}}">
-                                                                    <img src="/assets/formats/mp4.png" height="64" width="64" alt="{{$file->name ?? 'No name'}}"><br>
-                                                                    {{strlen($file->name ?? 'No name') > 10 ? substr($file->name ?? 'No name',0,7).'...' : $file->name ?? 'No name'}}
-                                                                </a>
-                                                                @include('storage.partials._drop-menu')
-                                                            </div>
-                                                            @break
-                                                            @case('svg')
-                                                            <div class="col-md-2">
-                                                                <a href="javascript:void(0);" style="cursor: pointer;" data-toggle="tooltip" data-placement="top" title="{{$file->name ?? 'No name'}}" data-original-title="{{$file->name ?? 'No name'}}">
-                                                                    <img src="/assets/formats/svg.png" height="64" width="64" alt="{{$file->name ?? 'No name'}}"><br>
-                                                                    {{strlen($file->name ?? 'No name') > 10 ? substr($file->name ?? 'No name',0,7).'...' : $file->name ?? 'No name'}}
-                                                                </a>
-                                                                @include('storage.partials._drop-menu')
-                                                            </div>
-                                                            @break
-                                                            @case('xml')
-                                                            <div class="col-md-2">
-                                                                <a href="javascript:void(0);" style="cursor: pointer;" data-toggle="tooltip" data-placement="top" title="{{$file->name ?? 'No name'}}" data-original-title="{{$file->name ?? 'No name'}}">
-                                                                    <img src="/assets/formats/xml.png" height="64" width="64" alt="{{$file->name ?? 'No name'}}"><br>
-                                                                    {{strlen($file->name ?? 'No name') > 10 ? substr($file->name ?? 'No name',0,7).'...' : $file->name ?? 'No name'}}
-                                                                </a>
-                                                                @include('storage.partials._drop-menu')
-                                                            </div>
-                                                            @break
-                                                            @case('zip')
-                                                            <div class="col-md-2">
-                                                                <a href="javascript:void(0);" style="cursor: pointer;" data-toggle="tooltip" data-placement="top" title="{{$file->name ?? 'No name'}}" data-original-title="{{$file->name ?? 'No name'}}">
-                                                                    <img src="/assets/formats/zip.png" height="64" width="64" alt="{{$file->name ?? 'No name'}}"><br>
-                                                                    {{strlen($file->name ?? 'No name') > 10 ? substr($file->name ?? 'No name',0,7).'...' : $file->name ?? 'No name'}}
-                                                                </a>
-                                                                @include('storage.partials._drop-menu')
-                                                            </div>
-                                                            @break
-                                                        @endswitch
-                                                    @endforeach
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -587,7 +214,7 @@
                 </div>
                 <div class="card">
                     <div class="card-body">
-                        <h4 class="card-title mb-5"> Client Activity Log</h4>
+                        <h4 class="card-title mb-5"> User Activity Log</h4>
                         <div class="" style="height: 350px; overflow-y: scroll;">
                             <ul class="verti-timeline list-unstyled">
                                 @foreach($client->getClientLogs->take(10) as $log)
@@ -624,7 +251,7 @@
             <div class="modal-content">
                 <div class="modal-header" >
                     <button type="button" style="margin: 0px; padding: 0px;" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    <h4 class="modal-title" id="myModalLabel2">Edit Client Profile</h4>
+                    <h4 class="modal-title text-uppercase" id="myModalLabel2">Edit User Profile</h4>
                 </div>
 
                 <div class="modal-body">
@@ -696,59 +323,16 @@
         </div>
     </div>
 
-    <div class="modal right fade" id="addMedication" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header" >
-                    <h4 class="modal-title" id="myModalLabel2">Medication</h4>
-                    <button type="button" style="margin: 0px; padding: 0px;" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-
-                <div class="modal-body">
-                    <form autocomplete="off" data-parsley-validate="" id="addMedicationForm" action="{{route('add-medication')}}" method="post" enctype="multipart/form-data">
-                        @csrf
-                        <input type="hidden" name="clientId" value="{{$client->id}}">
-                        <div class="form-group mt-3">
-                            <label for="">Drug Name <span class="text-danger">*</span></label>
-                            <input type="text" name="drugName" required data-parsley-required-message="Enter drug name" placeholder="Drug Name" value="{{old('drugName') }}" class="form-control">
-                            @error('drugName') <i class="text-danger">{{$message}}</i>@enderror
-                        </div>
-                        <div class="form-group mt-1">
-                            <label for="">Quantity<span class="text-danger">*</span></label>
-                            <input type="number" name="quantity" value="{{old('quantity') }}" placeholder="Quantity" class="form-control">
-                            @error('quantity') <i class="text-danger">{{$message}}</i>@enderror
-                        </div>
-                        <div class="input-group bootstrap-touchspin bootstrap-touchspin-injected mt-3">
-                            <span class="input-group-btn input-group-prepend">
-                                <button class="btn btn-primary bootstrap-touchspin-down" type="button">Start Date</button>
-                            </span>
-                            <input data-toggle="touchspin" required data-parsley-required-message="When should this person start this medication?" type="date" value="{{date('Y-m-d')}}" name="startDate" class="form-control">
-                            <span class="input-group-btn input-group-append">
-                                <button class="btn btn-primary bootstrap-touchspin-up" type="button">End Date</button>
-                            </span>
-                            <input data-toggle="touchspin" required data-parsley-required-message="Alright, when is the medication expected to end?" type="date" value="{{date('Y-m-d')}}" name="endDate" class="form-control">
-                            @error('startDate') <i class="text-danger">{{$message}}</i>@enderror &nbsp;
-                            @error('endDate') <i class="text-danger">{{$message}}</i>@enderror
-                        </div>
-                        <div class="form-group mt-1">
-                            <label for="">Prescription <span class="text-danger">*</span> </label>
-                            <textarea name="prescription" required data-parsley-required-message="Enter prescription in the box provided" placeholder="Type prescription here..." id="prescription" style="resize: none;" class="form-control">{{old('prescription')}}</textarea>
-                            @error('prescription') <i class="text-danger">{{$message}}</i>@enderror
-                        </div>
-                        <div class="form-group d-flex justify-content-center mt-3">
-                            <div class="btn-group">
-                                <button type="submit" class="btn btn-primary  waves-effect waves-light">Submit <i class="bx bxs-right-arrow"></i> </button>
-                            </div>
-                        </div>
-                    </form>
-
-                </div>
-            </div>
-        </div>
-    </div>
+    @include('clients.partials._add-follow-up-entry')
 @endsection
 
 @section('extra-scripts')
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+
     <script src="/assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
     <script src="/assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
     <script src="/assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
@@ -786,5 +370,21 @@
         });
     </script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.8.0/html2pdf.bundle.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#description').summernote({
+                height:200,
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['font', ['strikethrough', 'superscript', 'subscript']],
+                    ['fontsize', ['fontsize']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['height', ['height']]
+                ]
 
+            });
+        });
+    </script>
 @endsection

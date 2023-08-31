@@ -5,7 +5,11 @@ namespace App\Http\Controllers\portal;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\Automation;
+use App\Models\CashBook;
+use App\Models\CashBookAccount;
+use App\Models\CashBookAttachment;
 use App\Models\Client;
+use App\Models\Currency;
 use App\Models\Lead;
 use App\Models\LeadNote;
 use App\Models\LeadSource;
@@ -14,8 +18,10 @@ use App\Models\Message;
 use App\Models\Notification;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\Remittance;
 use App\Models\Sale;
 use App\Models\SaleItem;
+use App\Models\TransactionCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -34,6 +40,13 @@ class SalesnMarketingController extends Controller
         $this->leadnote = new LeadNote();
         $this->message = new Message();
         $this->automation = new Automation();
+
+        $this->cashbookaccount = new CashBookAccount();
+        $this->transactiontype = new TransactionCategory();
+        $this->cashbook = new CashBook();
+        $this->currency = new Currency();
+        $this->casbookattachment = new CashBookAttachment();
+        $this->remittance = new Remittance();
     }
 
     public function showAllProducts()
@@ -104,42 +117,58 @@ class SalesnMarketingController extends Controller
         return back();
     }
 
-    public function showSales(){
-        $orgId = Auth::user()->org_id;
-        return view('sales.index',[
-            'products'=>$this->product->getAllOrgProducts(),
-            'clients'=>$this->client->getAllOrgClients($orgId),
-            'sales'=>$this->sale->getAllOrgSales(),
-            'yesterdays'=>$this->sale->getOrgYesterdaysSales($orgId),
-            'todays'=>$this->sale->getOrgTodaysSales($orgId),
-            'thisWeek'=>$this->sale->getOrgThisWeekSales($orgId),
+    public function showIncome(){
+        $branchId = Auth::user()->branch;
+        return view('income.index',[
+            'accounts'=>$this->cashbookaccount->getBranchAccounts($branchId),
+            'categories'=>$this->transactiontype->getBranchCategoriesByType($branchId, 1),
+            'currencies'=>$this->currency->getCurrencies(),
+            //'products'=>$this->product->getAllOrgProducts(),
+            'income'=>$this->cashbook->getAllBranchLocalTransactions(1),
+            'fxIncomes'=>$this->cashbook->getAllBranchFxTransactions(1),
+            'defaultCurrency'=>$this->cashbook->getDefaultCurrency(),
+            'lastMonth'=>$this->cashbook->getBranchLastMonths($branchId),
+            'thisMonth'=>$this->cashbook->getBranchMonths($branchId),
+            'thisWeek'=>$this->cashbook->getBranchThisWeek($branchId),
         ]);
     }
 
-    public function createSales(Request $request){
+    public function recordIncome(Request $request){
         $this->validate($request,[
-            "client"=>"required",
+            "account"=>"required",
             "date"=>"required|date",
             "paymentMethod"=>"required",
-            "unitCost"=>"required|array",
-            "unitCost.*"=>"required",
-            "quantity"=>"required|array",
-            "quantity.*"=>"required",
-            "itemName"=>"required|array",
-            "itemName.*"=>"required",
+            "category"=>"required",
+            "transactionType"=>"required",
+            "amount"=>"required",
+            "currency"=>"required",
+            "narration"=>"required",
         ],[
-            "client.required"=>"Select client",
+            "account.required"=>"Choose an account for this transaction",
             "date.required"=>"Enter transaction date",
             "date.date"=>"Enter a valid date format",
             "paymentMethod.required"=>"Select payment method",
+            "category.required"=>"Select category from the list provided.",
+            "amount.required"=>"Enter an amount for this transaction",
+            "currency.required"=>"Choose currency",
+            "narration.required"=>"Leave a brief narration",
         ]);
         try{
-            $sales = $this->sale->addSales($request);
-            $this->saleitem->addItems($request, $sales->id);
+            $branchId = Auth::user()->branch;
+            $debit = $request->transactionType == 1 ? 0 : $request->amount;
+            $credit = $request->transactionType == 1 ? $request->amount : 0;
+            $refCode = $this->cashbook->generateReferenceCode();
+            //addCashBook($branchId, $categoryId, $accountId, $currency, $paymentMethod, $level, $transactionType, $transactionDate, $description, $narration = null, $debit = 0, $credit = 0, $refCode)
+           $cashbook =  $this->cashbook->addCashBook($branchId, $request->category, $request->account, $request->currency,
+            $request->paymentMethod, 0, $request->transactionType, $request->date, $request->narration,$request->narration, $debit, $credit, $refCode);
+
+            if ($request->hasFile('attachments')) {
+                $this->casbookattachment->storeAttachment($request, $cashbook->cashbook_id);
+            }
             //setNewNotification($subject, $body, $route_name, $route_param, $route_type, $user_id, $orgId)
-            Notification::setNewNotification('New invoice generated', 'A new invoice was raised for a client.',
-                'view-client-profile', $sales->slug, 1, Auth::user()->id, Auth::user()->org_id);
-            session()->flash("success", "Sales recorded!");
+            //Notification::setNewNotification('New invoice generated', 'A new invoice was raised for a client.',
+            //    'view-client-profile', $sales->slug, 1, Auth::user()->id, Auth::user()->org_id);
+            session()->flash("success", "Action successful!");
             return back();
         }catch (\Exception $exception){
             session()->flash("error", "Whoops! Something went wrong.");
@@ -147,6 +176,146 @@ class SalesnMarketingController extends Controller
         }
 
     }
+
+
+
+    public function showExpense(){
+        $branchId = Auth::user()->branch;
+        return view('expense.index',[
+            'accounts'=>$this->cashbookaccount->getBranchAccounts($branchId),
+            'categories'=>$this->transactiontype->getBranchCategoriesByType($branchId, 2),
+            'currencies'=>$this->currency->getCurrencies(),
+            'income'=>$this->cashbook->getAllBranchLocalTransactions(2),
+            'fxIncomes'=>$this->cashbook->getAllBranchFxTransactions(2),
+            'defaultCurrency'=>$this->cashbook->getDefaultCurrency(),
+            'lastMonth'=>$this->cashbook->getBranchLastMonths($branchId),
+            'thisMonth'=>$this->cashbook->getBranchMonths($branchId),
+            'thisWeek'=>$this->cashbook->getBranchThisWeek($branchId),
+        ]);
+    }
+
+    public function recordExpense(Request $request){
+        $this->validate($request,[
+            "account"=>"required",
+            "date"=>"required|date",
+            "paymentMethod"=>"required",
+            "category"=>"required",
+            "transactionType"=>"required",
+            "amount"=>"required",
+            "currency"=>"required",
+            "narration"=>"required",
+        ],[
+            "account.required"=>"Choose an account for this transaction",
+            "date.required"=>"Enter transaction date",
+            "date.date"=>"Enter a valid date format",
+            "paymentMethod.required"=>"Select payment method",
+            "category.required"=>"Select category from the list provided.",
+            "amount.required"=>"Enter an amount for this transaction",
+            "currency.required"=>"Choose currency",
+            "narration.required"=>"Leave a brief narration",
+        ]);
+        try{
+            $branchId = Auth::user()->branch;
+            $debit = $request->transactionType == 1 ? 0 : $request->amount;
+            $credit = $request->transactionType == 1 ? $request->amount : 0;
+            $refCode = $this->cashbook->generateReferenceCode();
+            //addCashBook($branchId, $categoryId, $accountId, $currency, $paymentMethod, $level, $transactionType, $transactionDate, $description, $narration = null, $debit = 0, $credit = 0, $refCode)
+            $cashbook =  $this->cashbook->addCashBook($branchId, $request->category, $request->account, $request->currency,
+                $request->paymentMethod, 0, $request->transactionType, $request->date, $request->narration,$request->narration, $debit, $credit, $refCode);
+
+            if ($request->hasFile('attachments')) {
+                $this->casbookattachment->storeAttachment($request, $cashbook->cashbook_id);
+            }
+            //setNewNotification($subject, $body, $route_name, $route_param, $route_type, $user_id, $orgId)
+            //Notification::setNewNotification('New invoice generated', 'A new invoice was raised for a client.',
+            //    'view-client-profile', $sales->slug, 1, Auth::user()->id, Auth::user()->org_id);
+            session()->flash("success", "Action successful!");
+            return back();
+        }catch (\Exception $exception){
+            session()->flash("error", "Whoops! Something went wrong.");
+            return back();
+        }
+
+    }
+
+
+
+    public function showRemittance(){
+        $from = date('Y-m-d', strtotime("-7 days"));
+        $to = date('Y-m-d');
+        return view('remittance.index',[
+            'defaultCurrency'=>$this->cashbook->getDefaultCurrency(),
+            'search'=>0,
+            'from'=>$from,
+            'to'=>$to,
+
+        ]);
+    }
+
+    public function showRemittanceCollections(Request $request){
+        $branchId = Auth::user()->branch;
+        $this->validate($request,[
+            'from'=>'required|date',
+            'to'=>'required|date'
+        ],[
+            'from.required'=>'Choose start date',
+            'from.date'=>'Enter a valid date',
+            'to.date'=>'Enter a valid date',
+            'to.required'=>'Choose end date',
+        ]);
+        $from = $request->from;
+        $to = $request->to;
+        //$ids = $this->cashbook->pluckCashbookIdsByDateRange($from, $to, $branchId);
+        return view('remittance.index',[
+            'transactions'=>$this->cashbook->getBranchMonthsUnpaidRemittance($from, $to, $branchId),
+           // 'fxIncomes'=>$this->cashbook->getAllBranchFxTransactions(2),
+            'defaultCurrency'=>$this->cashbook->getDefaultCurrency(),
+            'localCashbookIds'=>$this->cashbook->pluckCashbookIdsByDateRange($from, $to, $branchId),
+            'search'=>1,
+            'from'=>$from,
+            'to'=>$to,
+
+        ]);
+    }
+
+    public function processRemittanceRequest(Request $request){
+        $this->validate($request,[
+            'collectionFrom'=>'required|date',
+            'collectionTo'=>'required|date',
+            'rate'=>'required|array',
+            'rate.*'=>'required',
+            'locals'=>'required|array',
+            'category'=>'required|array',
+            'category.*'=>'required',
+            'amount'=>'required|array',
+            'amount.*'=>'required',
+        ],[
+            'collectionFrom.required'=>'Choose start date',
+            'collectionFrom.date'=>'Enter a valid date',
+            'collectionTo.date'=>'Enter a valid date',
+            'collectionTo.required'=>'Choose end date',
+            'rate.required'=>'Enter rate',
+            'category.*.required'=>'Category is required',
+            'amount.*.required'=>'Amount is required'
+
+        ]);
+        $branchId = Auth::user()->branch;
+        $refCode = $this->generateRefCode();
+        $narration = $request->narration ?? 'No narration';
+        #Push to remittance table
+        for($i = 0; $i<count($request->category); $i++){
+            $remittance = $this->remittance->storeRemittance($branchId, $request->amount[$i], $request->rate[$i], $request->rate[$i] > 0 ? 1 : 3, $refCode, $request->category[$i],
+            1, $narration, $request->collectionFrom, $request->collectionTo );
+        }
+        #Update cashbook records
+        $cashbookTransactions = $this->cashbook->getBulkTransactionsByCategoryIds(json_decode($request->locals[0]), $branchId);
+        foreach($cashbookTransactions as $cashbookTransaction){
+            $this->cashbook->updateCashbookRemittance($cashbookTransaction->cashbook_id, $refCode);
+        }
+        session()->flash("success", "Your transaction was successful! It is currently awaiting confirmation");
+        return redirect()->route('remittance');
+    }
+
 
     public function marketing(){
         return view('sales.marketing',[
@@ -362,5 +531,10 @@ class SalesnMarketingController extends Controller
         $this->automation->editAutomation($request);
         session()->flash("success", "Your changes were save!");
         return back();
+    }
+
+    private function generateRefCode()
+    {
+        return substr(sha1(time()),31,40);
     }
 }

@@ -46,7 +46,7 @@
                 <div class="col-md-12 col-sm-12 mt-4">
                     <div class="d-flex justify-content-between modal-header">
                         <div class="h6 text-left pl-5 text-uppercase text-primary"> Add New Account</div>
-                        <a href="{{route('chart-of-accounts')}}" class="btn btn-primary mr-3" > <i class="bx bx-food-menu"></i> Manage Accounts</a>
+                        <a href="{{route('accounting.chart-of-accounts')}}" class="btn btn-primary mr-3" > <i class="bx bx-food-menu"></i> Manage Accounts</a>
                     </div>
 
                     <div class="container pb-5 mt-5">

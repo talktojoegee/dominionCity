@@ -50,6 +50,21 @@ class User extends Authenticatable
     public function getUserCountry(){
         return $this->belongsTo(Country::class, 'country_id');
     }
+    public function getUserState(){
+        return $this->belongsTo(State::class, 'state_id');
+    }
+
+    public function getUserMaritalStatus(){
+        return $this->belongsTo(MaritalStatus::class, 'marital_status');
+    }
+    public function getUserRole(){
+        return $this->belongsTo(Role::class, 'role');
+    }
+
+
+    public function getUserChurchBranch(){
+        return $this->belongsTo(ChurchBranch::class, 'branch');
+    }
     public function getUserAccount(){
         return $this->hasMany(BulkSmsAccount::class, 'user_id')->orderBy('id', 'DESC');
     }
@@ -66,8 +81,9 @@ class User extends Authenticatable
     }
 
     public function getUserOrganization(){
-        return $this->belongsTo(Organization::class, 'org_id');
+        return $this->belongsTo(Organization::class, 'org_id', 'id');
     }
+
 
     public function getUserHomepageSettings(){
         return $this->belongsTo(Homepage::class, 'org_id');
@@ -180,6 +196,77 @@ class User extends Authenticatable
 
     public function getUserBySlug($slug){
         return User::where('slug', $slug)->first();
+    }
+
+    public function getOtherUsersSameBranch($branch){
+        return User::where('branch', $branch)->take(5)->get();
+    }
+
+    public function getAllBranchUsers($branchId){
+        return User::where('branch', $branchId)->orderBy('first_name', 'ASC')->get();
+    }
+
+
+/*
+    public function getUserAccount(){ //git test
+        return $this->hasMany(BulkSmsAccount::class, 'user_id')->orderBy('id', 'DESC');
+    }*/
+
+    public function getUserBulkSMSReport(){
+        return $this->hasMany(BulkMessage::class, 'user_id')->orderBy('id', 'DESC');
+    }
+
+    public function getUserPhoneGroups(){
+        return $this->hasMany(PhoneGroup::class, 'user_id');
+    }
+
+    public function getUserSenderIds(){
+        return $this->hasMany(SenderId::class, 'user_id');
+    }
+
+/*
+    public function createUser(Request $request){
+        $user = new User();
+        $user->first_name = $request->firstName;
+        $user->mobile_no = $request->phoneNumber;
+        $user->email = $request->email;
+        $user->password = bcrypt($request->password);
+        $user->uuid = Str::uuid();
+        $user->api_token = Str::random(60);
+        $user->save();
+        return $user;
+    }*/
+
+
+    public function apiTokenGenerator(){
+        $user = User::find(Auth::user()->id);
+        $user->api_token = Str::random(60);
+        $user->save();
+    }
+
+    public function getUserByUuid($uuid){
+        return User::where('uuid', $uuid)->first();
+    }
+   /* public function getUserById($id){
+        return User::find( $id);
+    }*/
+
+    public function updateUser(Request $request, $mobile){
+        $user = User::find($request->id);
+        $user->first_name = $request->firstName;
+        $user->mobile_no = $request->phoneNumber;
+        //$user->email = $request->email;
+        //$user->password = bcrypt($request->password);
+        $user->uuid = Str::uuid();
+        $user->save();
+        return $user;
+    }
+   /* public function getUserByEmail($email){
+        return User::where('email', $email)->first();
+    }*/
+
+    public function getToken($token){
+        return User::select('api_token')->where('api_token', $token)->first();
     }
 
 /*

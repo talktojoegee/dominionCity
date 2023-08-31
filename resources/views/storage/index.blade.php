@@ -41,7 +41,10 @@
     <div class="row">
         <div class="col-md-4 col-lg-4">
             <div class="card">
-                <div class="card-header bg-primary text-white">New Attachments</div>
+                <div class="modal-header">
+
+                    <div class="modal-title text-uppercase">New Attachments</div>
+                </div>
                 <div class="card-body">
                     <div class="col-xl-12 col-md-12 col-lg-12">
                         <h4 class="card-title">Documents</h4>
@@ -137,7 +140,10 @@
         </div>
         <div class="col-md-8 col-lg-8">
             <div class="card">
-                <div class="card-header bg-primary text-white">Browse Files & Folders</div>
+                <div class="modal-header">
+
+                    <div class="modal-title text-uppercase">Browse Files & Folders</div>
+                </div>
                 <div class="card-body">
                     <div class="row">
                         @foreach($folders as $folder)

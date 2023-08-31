@@ -33,15 +33,18 @@ class ClientController extends Controller
     public function addClient(Request $request){
         $this->validate($request,[
            'firstName'=>'required',
-           'lastName'=>'required',
-           'email'=>'required|email',
+           //'lastName'=>'required',
+           //'email'=>'required|email',
            'mobileNo'=>'required',
            'clientGroup'=>'required',
+           'date'=>'required|date',
         ],[
             "firstName.required"=>"Enter client first name",
-            "lastName.required"=>"Enter client last name",
-            "email.required"=>"Enter client email address",
-            "email.email"=>"Enter a valid email address",
+            //"lastName.required"=>"Enter client last name",
+            "date.required"=>"Choose date",
+            "date.date"=>"Enter a valid date format",
+            //"email.required"=>"Enter client email address",
+            //"email.email"=>"Enter a valid email address",
             "mobileNo.required"=>"Enter client mobile phone number",
             "clientGroup.required"=>"Assign client to a group",
         ]);

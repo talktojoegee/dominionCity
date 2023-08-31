@@ -38,7 +38,7 @@ class DashboardController extends Controller
         //$ipAddress = $_SERVER['REMOTE_ADDR'];
         //return dd($request->getClientIp());
         //retrieve visitors and pageview data for the current day and the last seven days
-        $data = Analytics::fetchMostVisitedPages(Period::years(7));
+        //$data = Analytics::fetchMostVisitedPages(Period::years(7));
        // return dd($data);
         return view('dashboard',[
             'products'=>$this->product->getAllOrgProducts(),
