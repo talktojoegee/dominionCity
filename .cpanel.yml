@@ -3,5 +3,5 @@
 deployment:
   tasks:
     # - export DEPLOYPATH=/home/smschann/public_html/
-    - export DEPLOYPATH=/home/smschann/public_html/
+    - export DEPLOYPATH=/home/mediasui/public_html/church
     - /bin/cp -R * $DEPLOYPATH
