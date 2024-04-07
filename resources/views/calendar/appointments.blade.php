@@ -1,6 +1,6 @@
 @extends('layouts.master-layout')
 @section('current-page')
-    All Appointments
+    All Events
 @endsection
 @section('extra-styles')
     <link rel="stylesheet" href="/css/nprogress.css">
@@ -26,7 +26,7 @@
                     <div class="card-body">
                         <div class="row mb-1">
                             <div class="col">
-                                <p class="mb-2">Appointments</p>
+                                <p class="mb-2">Events</p>
                                 <h3 class="mb-0 number-font">{{number_format($appointments->count())}}</h3>
                             </div>
                             <div class="col-auto mb-0">
@@ -34,7 +34,7 @@
                             </div>
                         </div>
                         <span class="fs-12 text-success"> <strong>Overall</strong> </span>
-                        <span class="text-muted fs-12 ms-0 mt-1">Appointments </span>
+                        <span class="text-muted fs-12 ms-0 mt-1">Events </span>
                     </div>
                 </div>
             </div>
@@ -42,13 +42,13 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="row mb-1">
-                            <div class="col"> <p class="mb-2">Appointments</p><h3 class="mb-0 number-font">{{ number_format($yesterdays->count()) }}</h3> </div>
+                            <div class="col"> <p class="mb-2">Events</p><h3 class="mb-0 number-font">{{ number_format($yesterdays->count()) }}</h3> </div>
                             <div class="col-auto mb-0">
                                 <div class="dash-icon text-secondary1"> <i class="bx bxs-timer text-warning fs-22"></i> </div>
                             </div>
                         </div>
                         <span class="fs-12 text-warning"> <strong>Yesterday's</strong>  </span>
-                        <span class="text-muted fs-12 ms-0 mt-1">Appointments </span>
+                        <span class="text-muted fs-12 ms-0 mt-1">Events </span>
                     </div>
                 </div>
             </div>
@@ -56,7 +56,7 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="row mb-1">
-                            <div class="col"> <p class="mb-2">Appointments</p>
+                            <div class="col"> <p class="mb-2">Events</p>
                                 <h3 class="mb-0 number-font">{{number_format($todays->count())}}</h3>
                             </div>
                             <div class="col-auto mb-0">
@@ -65,7 +65,7 @@
                             </div>
                         </div>
                         <span class="fs-12 text-primary"> <strong>Today's</strong>  </span>
-                        <span class="text-muted fs-12 ms-0 mt-1">Appointments </span>
+                        <span class="text-muted fs-12 ms-0 mt-1">Events </span>
                     </div>
                 </div>
             </div>
@@ -74,7 +74,7 @@
                     <div class="card-body">
                         <div class="row mb-1">
                             <div class="col">
-                                <p class="mb-2">Appointments</p>
+                                <p class="mb-2">Events</p>
                                 <h3 class="mb-0 number-font">{{number_format($thisWeek->count())}}</h3>
                             </div>
                             <div class="col-auto mb-0">
@@ -82,7 +82,7 @@
                             </div>
                         </div>
                         <span class="fs-12 text-info"> <strong>This Week's</strong>  </span>
-                        <span class="text-muted fs-12 ms-0 mt-1">Appointments </span>
+                        <span class="text-muted fs-12 ms-0 mt-1">Events </span>
                     </div>
                 </div>
             </div>
@@ -91,11 +91,11 @@
             <div class="col-xl-12 col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#client" class="btn btn-primary  mb-3">Add New Appointment <i class="bx bxs-timer"></i> </a>
+                        <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#client" class="btn btn-primary  mb-3">Add New Event <i class="bx bxs-timer"></i> </a>
                     </div>
                     <div class="card-body">
 
-                        <h4 class="card-title">All Appointments</h4>
+                        <h4 class="card-title">All Events</h4>
                         @if(session()->has('success'))
                             <div class="alert alert-success alert-dismissible fade show" role="alert">
                                 <i class="mdi mdi-check-all me-2"></i>
@@ -141,7 +141,7 @@
                                                        <small class="badge rounded-pill bg-info">+{{$appoint->getInvitees->count() - 1}} others</small>
                                                     @endif
                                                     @else
-                                                        <span class="text-warning">Block Session</span>
+                                                        <span class="text-muted">{{ $appoint->note ?? '' }}</span>
                                                     @endif
 
                                                 </td>
@@ -225,7 +225,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header" >
-                    <h6 class="modal-title text-uppercase" id="myModalLabel2">Add New Appointment</h6>
+                    <h6 class="modal-title text-uppercase" id="myModalLabel2">Add New Events</h6>
                     <button type="button" style="margin: 0px; padding: 0px;" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 

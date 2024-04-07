@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class PostCorrespondingPerson extends Model
 {
@@ -17,5 +18,13 @@ class PostCorrespondingPerson extends Model
         $corr->pcp_type = $type;
         $corr->pcp_target = $values;
         $corr->save();
+    }
+
+    public function getCorrespondingPostsForEveryOne(){
+        return PostCorrespondingPerson::pluck('pcp_post_id')->get();
+    }
+    public function getCorrespondingPosts($type, $targetId){
+        return PostCorrespondingPerson::where('pcp_type', $type)
+            ->whereJsonContains('pcp_target', $targetId)->get();
     }
 }

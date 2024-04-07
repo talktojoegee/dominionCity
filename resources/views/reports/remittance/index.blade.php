@@ -48,12 +48,6 @@
                                                 <span class="d-none d-sm-block">{{$defaultCurrency->name ?? '' }} ({{$defaultCurrency->symbol ?? '' }}) Transactions</span>
                                             </a>
                                         </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" data-bs-toggle="tab" href="#profile1" role="tab">
-                                                <span class="d-block d-sm-none"><i class="far fa-user"></i></span>
-                                                <span class="d-none d-sm-block">FX Transactions</span>
-                                            </a>
-                                        </li>
                                     </ul>
 
                                     <!-- Tab panes -->
@@ -293,28 +287,6 @@
                                                         </table>
                                                     </div>
                                                 </div>
-
-                                            </div>
-                                        </div>
-                                        <div class="tab-pane" id="profile1" role="tabpanel">
-                                            <div class="card-body">
-                                                @if(session()->has('success'))
-                                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                                        <i class="mdi mdi-check-all me-2"></i>
-                                                        {!! session()->get('success') !!}
-                                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                                    </div>
-                                                @endif
-                                                @if($errors->any())
-                                                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                                                        <i class="mdi mdi-close me-2"></i>
-                                                        @foreach($errors->all() as $error)
-                                                            <li>{{$error}}</li>
-                                                        @endforeach
-                                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                                    </div>
-                                                @endif
-                                                fx
 
                                             </div>
                                         </div>

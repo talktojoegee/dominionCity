@@ -3,14 +3,23 @@
 namespace App\Http\Controllers\portal;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\OkraOpenBankingTrait;
+use App\Imports\BulkCashbookImportDetailImport;
+use App\Imports\BulkImportLead;
 use App\Models\ActivityLog;
 use App\Models\Automation;
+use App\Models\BulkCashbookImportDetail;
+use App\Models\BulkCashbookImportMaster;
 use App\Models\CashBook;
 use App\Models\CashBookAccount;
 use App\Models\CashBookAttachment;
 use App\Models\Client;
 use App\Models\Currency;
 use App\Models\Lead;
+use App\Models\LeadBulkImportDetail;
+use App\Models\LeadBulkImportMaster;
+use App\Models\LeadFollowupScheduleDetail;
+use App\Models\LeadFollowupScheduleMaster;
 use App\Models\LeadNote;
 use App\Models\LeadSource;
 use App\Models\LeadStatus;
@@ -24,9 +33,13 @@ use App\Models\SaleItem;
 use App\Models\TransactionCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Excel;
+use Illuminate\Support\Str;
 
 class SalesnMarketingController extends Controller
 {
+    use OkraOpenBankingTrait;
+
     public function __construct(){
         $this->middleware('auth');
         $this->productcategory = new ProductCategory();
@@ -47,6 +60,13 @@ class SalesnMarketingController extends Controller
         $this->currency = new Currency();
         $this->casbookattachment = new CashBookAttachment();
         $this->remittance = new Remittance();
+        $this->bulkcashbookimportmaster = new BulkCashbookImportMaster();
+        $this->bulkcashbookimportdetails = new BulkCashbookImportDetail();
+
+        $this->leadbulkimportmaster = new LeadBulkImportMaster();
+        $this->leadbulkimportdetail = new LeadBulkImportDetail();
+        $this->leadfollowupmaster = new LeadFollowupScheduleMaster();
+        $this->leadfollowupdetail = new LeadFollowupScheduleDetail();
     }
 
     public function showAllProducts()
@@ -118,6 +138,8 @@ class SalesnMarketingController extends Controller
     }
 
     public function showIncome(){
+        //$r = $this->okraAuth();
+        //return dd($r);
         $branchId = Auth::user()->branch;
         return view('income.index',[
             'accounts'=>$this->cashbookaccount->getBranchAccounts($branchId),
@@ -158,9 +180,10 @@ class SalesnMarketingController extends Controller
             $debit = $request->transactionType == 1 ? 0 : $request->amount;
             $credit = $request->transactionType == 1 ? $request->amount : 0;
             $refCode = $this->cashbook->generateReferenceCode();
-            //addCashBook($branchId, $categoryId, $accountId, $currency, $paymentMethod, $level, $transactionType, $transactionDate, $description, $narration = null, $debit = 0, $credit = 0, $refCode)
+
            $cashbook =  $this->cashbook->addCashBook($branchId, $request->category, $request->account, $request->currency,
-            $request->paymentMethod, 0, $request->transactionType, $request->date, $request->narration,$request->narration, $debit, $credit, $refCode);
+            $request->paymentMethod, 0, $request->transactionType, $request->date,
+               $request->narration,$request->narration, $debit, $credit, $refCode,date('m', strtotime($request->date)), date('Y', strtotime($request->date)));
 
             if ($request->hasFile('attachments')) {
                 $this->casbookattachment->storeAttachment($request, $cashbook->cashbook_id);
@@ -219,9 +242,9 @@ class SalesnMarketingController extends Controller
             $debit = $request->transactionType == 1 ? 0 : $request->amount;
             $credit = $request->transactionType == 1 ? $request->amount : 0;
             $refCode = $this->cashbook->generateReferenceCode();
-            //addCashBook($branchId, $categoryId, $accountId, $currency, $paymentMethod, $level, $transactionType, $transactionDate, $description, $narration = null, $debit = 0, $credit = 0, $refCode)
             $cashbook =  $this->cashbook->addCashBook($branchId, $request->category, $request->account, $request->currency,
-                $request->paymentMethod, 0, $request->transactionType, $request->date, $request->narration,$request->narration, $debit, $credit, $refCode);
+                $request->paymentMethod, 0, $request->transactionType,
+                $request->date, $request->narration,$request->narration, $debit, $credit, $refCode,date('m', strtotime($request->date)),date('Y', strtotime($request->date)));
 
             if ($request->hasFile('attachments')) {
                 $this->casbookattachment->storeAttachment($request, $cashbook->cashbook_id);
@@ -318,7 +341,7 @@ class SalesnMarketingController extends Controller
 
 
     public function marketing(){
-        return view('sales.marketing',[
+        return view('followup.marketing',[
             'search'=>0,
             'from'=>now(),
             'to'=>now(),
@@ -342,7 +365,7 @@ class SalesnMarketingController extends Controller
         }
         if($request->filterType == 1){
             $income = $this->sale->getAllOrgSales();
-            return view('sales.marketing',[
+            return view('followup.marketing',[
                 'income'=>$income,
                 'search'=>1,
                 'from'=>now(),
@@ -352,7 +375,7 @@ class SalesnMarketingController extends Controller
         }else if($request->filterType == 2){
             $income = $this->sale->getRangeOrgSalesReport($request->from, $request->to);
             $this->income = $this->sale->getSalesStatRange($request->from, $request->to);
-            return view('sales.marketing',[
+            return view('followup.marketing',[
                 'income'=>$income,
                 'search'=>1,
                 'from'=>$request->from,
@@ -362,7 +385,7 @@ class SalesnMarketingController extends Controller
         }
     }
     public function showLeads(){
-        return view('sales.leads',[
+        return view('followup.leads',[
             'sources'=>$this->leadsource->getLeadSources(),
             'statuses'=>$this->leadstatus->getLeadStatuses(),
             'leads'=>$this->lead->getAllOrgLeads(),
@@ -371,6 +394,7 @@ class SalesnMarketingController extends Controller
 
     public function createLead(Request $request){
         $this->validate($request,[
+            'date'=>'required|date',
             'firstName'=>'required',
             'lastName'=>'required',
             'email'=>'required|email',
@@ -379,6 +403,8 @@ class SalesnMarketingController extends Controller
             'status'=>'required',
             'gender'=>'required',
         ],[
+            "date.required"=>"Enter date",
+            "date.date"=>"Enter a valid date",
             "firstName.required"=>"Enter client first name",
             "lastName.required"=>"Enter client last name",
             "email.required"=>"Enter client email address",
@@ -395,7 +421,7 @@ class SalesnMarketingController extends Controller
     public function leadProfile($slug){
         $lead = $this->lead->getLeadBySlug($slug);
         if(!empty($lead)){
-            return view('sales.lead-profile',[
+            return view('followup.lead-profile',[
                 'client'=>$lead
             ]);
         }else{
@@ -442,13 +468,221 @@ class SalesnMarketingController extends Controller
         return back();
     }
 
+
+    public function showBulkImportLeads(){
+        return view('followup.leads-bulk-import');
+    }
+
+    public function processLeadBulkImport(Request $request){
+        $this->validate($request, [
+            'attachment'=>'required'
+        ],[
+            'attachment.required'=>'Choose a file to upload',
+        ]);
+        $file = $request->attachment;
+
+        $this->validate($request,[
+            'attachment'=>'required|max:2048',
+        ],[
+            'attachment.required'=>'Choose a file to upload',
+            //'attachment.mimes'=>'Invalid file format. Upload either xlsx or xls file',
+            'attachment.max'=>'Maximum file upload size exceeded. Your file should not exceed 2MB'
+        ]);
+        $bulkimport = $this->leadbulkimportmaster->publishBulkImport($request, Auth::user()->id);
+        Excel::import(new BulkImportLead($request->firstRowHeader, $bulkimport->id), public_path("assets/drive/import/{$bulkimport->attachment}"));
+
+        session()->flash("success", "Success! Bulk import done.");
+        return back();
+    }
+
+    public function manageBulkLeadList(){
+        return view("followup.lead-bulk-import-list",[
+            "records"=>$this->leadbulkimportmaster->getAllRecords()
+        ]);
+    }
+
+
+    public function showBulkLeadImportDetails($batchCode){
+        $record = $this->leadbulkimportmaster->getRecordByBatchCode($batchCode);
+        if(empty($record)){
+            session()->flash("error", "Whoops! No record found");
+            return back();
+        }
+        return view("followup.lead-bulk-import-view",[
+            "record"=>$record
+        ]);
+    }
+
+
+    public function deleteLeadRecord($recordId){
+        $record = $this->leadbulkimportdetail->getLeadDetailById($recordId);
+        if(empty($record)){
+            session()->flash("error", "Whoops! Record does not exist");
+            return back();
+        }
+        $record->delete();
+        session()->flash("success", "Success! Record deleted");
+        return back();
+    }
+
+
+    public function discardLeadRecord($batchCode){
+        $record = $this->leadbulkimportmaster->getRecordByBatchCode($batchCode);
+        if(empty($record)){
+            session()->flash("error", "Whoops! Record does not exist");
+            return back();
+        }
+        $record->status = 2;
+        $record->save();
+        session()->flash("success", "Success! Record discarded");
+        return back();
+    }
+
+    public function postLeadRecord($batchCode){
+        $record = $this->leadbulkimportmaster->getRecordByBatchCode($batchCode);
+        if(empty($record)){
+            session()->flash("error", "Whoops! Record does not exist");
+            return back();
+        }
+        $record->status = 1;
+        $record->actioned_by = Auth::user()->id;
+        $record->action_date = now();
+        $record->save();
+
+        $items = $this->leadbulkimportdetail->getLeadDetailByMasterId($record->id);
+        if(count($items) > 0){
+            foreach($items as $item){
+                $lead = new Lead();
+                $lead->entry_date = date('Y-m-d', strtotime($item->entry_date)) ??  now();
+                $lead->added_by = $record->imported_by;
+                $lead->org_id = 1;
+                $lead->first_name = $item->first_name ?? null;
+                $lead->last_name = $item->last_name ?? null;
+                $lead->email = $item->email ??  null;
+                $lead->phone = $item->phone ?? null;
+                $lead->source_id = $item->source_id;
+                $lead->gender = $item->gender;
+                $lead->street = $item->address ?? null;
+                $lead->slug = Str::slug($item->first_name).'-'.Str::random(8);
+                $lead->save();
+            }
+        }
+        session()->flash("success", "Success! Record posted");
+        return back();
+    }
+
+
+    public function showScheduleFollowupForm(){
+        return view('followup.new-schedule',[
+            'search'=>0,
+            'month'=>null,
+            'year'=>null
+        ]);
+    }
+
+
+
+    public function showScheduleFollowupPreview(Request $request){
+        $this->validate($request,[
+            'period'=>'required'
+        ],[
+            'period.required'=>'Choose period'
+        ]);
+
+        $month = date('m', strtotime($request->period));
+        $year = date('Y', strtotime($request->period));
+        $records = $this->lead->getLeadByMonthYear($month, $year);
+        return view('followup.new-schedule',[
+            'search'=>1,
+            'records'=>$records,
+            'month'=>$month,
+            'year'=>$year
+        ]);
+    }
+
+    public function processFollowupSchedule(Request $request){
+
+        $this->validate($request,[
+            'date'=>'required|date',
+            'title'=>'required',
+            'objective'=>'required',
+            'leads'=>'required|array',
+            'leads.*'=>'required',
+            'periodMonth'=>'required',
+            'periodYear'=>'required',
+        ],[
+            'date.required'=>'Enter a date',
+            'date.date'=>'Enter a valid date',
+            'title.required'=>'Enter title',
+            'objective.required'=>"What's your objective?",
+            'leads.required'=>"Choose at least one person from the list to schedule",
+            'leads.*'=>"Choose at least one person from the list to schedule",
+            'periodMonth.required'=>'',
+            'periodYear.required'=>'',
+        ]);
+        $master =  $this->leadfollowupmaster->addScheduleMaster($request->date, $request->title,
+            $request->objective, $request->periodMonth, $request->periodYear);
+
+        foreach($request->leads as $lead){
+            $this->leadfollowupdetail->addDetail($master->id, $lead);
+        }
+        session()->flash('success', 'Success! Follow-up scheduled.');
+        return redirect()->route('schedule-follow-up');
+    }
+
+    public function manageFollowupSchedule(){
+        return view('followup.manage-schedule',[
+            'records'=>$this->leadfollowupmaster->getAllCurrentYearFollowupSchedules()
+        ]);
+    }
+
+
+    public function showFollowupDetails($refCode){
+        $record = $this->leadfollowupmaster->getFollowupScheduleByRefCode($refCode);
+        if(empty($record)){
+            abort(404);
+        }
+        return view('followup.manage-schedule-view',[
+            'record'=>$record
+        ]);
+    }
+
+    public function rateFollowupSchedule(Request $request){
+        $this->validate($request,[
+           'status'=>'required',
+           'score'=>'required',
+           'comment'=>'required',
+           'schedule'=>'required',
+        ],[
+            "status.required"=>"Choose status to rate schedule",
+            "score.required"=>"On a scale of 1 to 5, rate this schedule.",
+            "comment.required"=>"Help us understand your opinion by leaving a comment.",
+            "schedule.required"=>"",
+        ]);
+        $followup = $this->leadfollowupmaster->getLeadFollowupScheduleById($request->schedule);
+        if(empty($followup)){
+            session()->flash("error", 'Whoops! Something went wrong.');
+            return back();
+        }
+        $followup->actioned_by = Auth::user()->id;
+        $followup->action_date = now();
+        $followup->score = $request->score ?? 1;
+        $followup->comment = $request->comment ?? null;
+        $followup->status = $request->status ?? 0;
+        $followup->save();
+        session()->flash("success", 'Action successful.');
+        return back();
+    }
+
+
+
     public function showMessaging(){
-        return view('sales.messaging',[
+        return view('followup.messaging',[
             'messages'=>$this->message->getAllOrgMessages()
         ]);
     }
     public function showComposeMessaging(){
-        return view('sales.compose-message',[
+        return view('followup.compose-message',[
             'clients'=>$this->client->getAllOrgClients(Auth::user()->org_id),
         ]);
     }
@@ -471,18 +705,18 @@ class SalesnMarketingController extends Controller
 
 
     public function showAutomations(){
-        return view('sales.automations',[
+        return view('followup.automations',[
             'automations'=>$this->automation->getOrgAutomations()
         ]);
     }
 
     public function showCreateAutomation(){
-        return view('sales.create-automation');
+        return view('followup.create-automation');
     }
     public function showEditAutomationForm(Request $request){
         $automation = $this->automation->getAutomationBySlug($request->slug);
         if(!empty($automation)){
-            return view('sales.edit-automation',[
+            return view('followup.edit-automation',[
                 "automation"=>$automation
             ]);
         }else{
@@ -536,5 +770,127 @@ class SalesnMarketingController extends Controller
     private function generateRefCode()
     {
         return substr(sha1(time()),31,40);
+    }
+
+    public function showBulkImport(){
+        $branchId = Auth::user()->branch;
+        return view('bulk-import.index',[
+            'defaultCurrency'=>$this->cashbook->getDefaultCurrency(),
+            'accounts'=>$this->cashbookaccount->getBranchAccounts($branchId),
+            'search'=>0,
+
+        ]);
+    }
+    public function processBulkImport(Request $request){
+        $this->validate($request, [
+            'attachment'=>'required'
+        ],[
+            'attachment.required'=>'Choose a file to upload',
+        ]);
+        $file = $request->attachment;
+
+        $this->validate($request,[
+            'account'=>'required',
+            'monthYear'=>'required',
+            'batchCode'=>'required',
+            'attachment'=>'required|max:2048',
+        ],[
+            'account.required'=>'Select an account for this operation',
+            'monthYear.required'=>'Select month & year',
+            'batchCode.required'=>'Enter a unique batch code',
+            'attachment.required'=>'Choose a file to upload',
+            //'attachment.mimes'=>'Invalid file format. Upload either xlsx or xls file',
+            'attachment.max'=>'Maximum file upload size exceeded. Your file should not exceed 2MB'
+        ]);
+        $bulkimport = $this->bulkcashbookimportmaster->publishBulkImport($request, Auth::user()->id);
+
+        //\Maatwebsite\Excel\Facades\Excel::
+        Excel::import(new BulkCashbookImportDetailImport($request->firstRowHeader, Auth::user()->branch,Auth::user()->id,
+            $bulkimport->bcim_id,$request->account,date("m", strtotime($request->monthYear)),
+            date("Y", strtotime($request->monthYear)),
+            $request->batchCode), public_path("assets/drive/import/{$bulkimport->bcim_attachment}"));
+
+        session()->flash("success", "Success! Bulk import done.");
+        return back();
+    }
+
+
+    public function approveBulkImport(){
+        return view("bulk-import.approve-bulk-import",[
+            "records"=>$this->bulkcashbookimportmaster->getAllBulkImport()
+        ]);
+    }
+
+    public function viewBulkImport($batchCode){
+        $record = $this->bulkcashbookimportmaster->getOneBulkImportByBatchCode($batchCode);
+        if(empty($record)){
+            session()->flash("error", "Whoops! Record does not exist");
+            return back();
+        }
+        return view("bulk-import.view-bulk-import",[
+            "record"=>$record
+        ]);
+    }
+
+    public function deleteRecord($recordId){
+        $record = $this->bulkcashbookimportdetails->getRecordById($recordId);
+        if(empty($record)){
+            session()->flash("error", "Whoops! Record does not exist");
+            return back();
+        }
+        $record->delete();
+        session()->flash("success", "Success! Record deleted");
+        return back();
+    }
+
+
+    public function discardRecord($batchCode){
+        $record = $this->bulkcashbookimportmaster->getOneBulkImportByBatchCode($batchCode);
+        if(empty($record)){
+            session()->flash("error", "Whoops! Record does not exist");
+            return back();
+        }
+        $record->bcim_status = 2;
+        $record->save();
+        $items = $this->bulkcashbookimportdetails->getRecordByBatchCode($record->bcim_batch_code);
+        if(count($items) > 0){
+            foreach($items as $item){
+                $item->bcid_status = 2; //discarded
+                $item->save();
+            }
+        }
+        session()->flash("success", "Success! Record discarded");
+        return back();
+    }
+
+    public function postRecord($batchCode){
+        $record = $this->bulkcashbookimportmaster->getOneBulkImportByBatchCode($batchCode);
+        if(empty($record)){
+            session()->flash("error", "Whoops! Record does not exist");
+            return back();
+        }
+        $account = CashBookAccount::find($record->bcim_cba_id);
+        if(empty($account)){
+            abort(404);
+        }
+        $record->bcim_status = 1;
+        $record->save();
+
+        $items = $this->bulkcashbookimportdetails->getRecordByBatchCode($record->bcim_batch_code);
+        if(count($items) > 0){
+            foreach($items as $item){
+                $item->bcid_status = 1; //posted
+                $item->save();
+                //push to cashbook
+                $this->cashbook->addCashBook($item->bcid_branch_id, $item->bcid_category_id,
+                    $item->bcid_account_id, $account->cba_currency ?? 76, 1,
+                    1, $item->bcid_transaction_type, date("Y-m-d", strtotime($item->bcid_transaction_date)),
+                    $item->bcid_description, $item->bcid_narration ?? null,
+                    $item->bcid_debit, $item->bcid_credit, $item->bcid_ref_code,
+                    $item->bcid_month, $item->bcid_year);
+            }
+        }
+        session()->flash("success", "Success! Record posted");
+        return back();
     }
 }

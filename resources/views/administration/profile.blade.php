@@ -1,6 +1,6 @@
 @extends('layouts.master-layout')
 @section('current-page')
-    Profile
+
 @endsection
 @section('extra-styles')
     <link href="/assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
@@ -16,9 +16,6 @@
         <div class="col-12 grid-margin">
             <div class="card">
                 <div class="position-relative">
-                    <figure class="overflow-hidden mb-0 d-flex justify-content-center">
-                        <img src="{{url('storage/covers/profile-cover.jpg')}}" class="rounded-top " alt="profile cover">
-                    </figure>
                     <div class="d-flex justify-content-between align-items-center position-absolute top-90 w-100 px-2 px-md-4 mt-n4">
                         <div>
                             <img class="wd-70 rounded-circle img-thumbnail avatar-xl" src="{{url('storage/'.$user->image)}}" alt="profile">
@@ -45,7 +42,6 @@
         </div>
     </div>
     <div class="row profile-body">
-        <!-- left wrapper start -->
         <div class="d-none d-md-block col-md-4 col-xl-3 left-wrapper">
             <div class="card rounded">
                 <div class="">
@@ -138,7 +134,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-8 col-xl-6 middle-wrapper">
+        <div class="col-md-8 col-xl-9 middle-wrapper">
             <div class="row">
                 <div class="col-md-12 grid-margin">
                     @if(session()->has('success'))
@@ -167,229 +163,29 @@
                                 </div>
                             </div>
                         @endif
-                    <div class="card rounded">
-                        <div class="card-header">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div class="d-flex align-items-center">
-                                    <img class="avatar-xs rounded-circle" src="https://www.nobleui.com/html/template/assets/images/faces/face1.jpg" alt="">
-                                    <div class="ms-2">
-                                        <p>Mike Popescu</p>
-                                        <p class="tx-11 text-muted">1 min ago</p>
-                                    </div>
-                                </div>
-                                <div class="dropdown">
-                                    <a type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal icon-lg pb-3px"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-                                    </a>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-meh icon-sm me-2"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="15" x2="16" y2="15"></line><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg> <span class="">Unfollow</span></a>
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-corner-right-up icon-sm me-2"><polyline points="10 9 15 4 20 9"></polyline><path d="M4 20h7a4 4 0 0 0 4-4V4"></path></svg> <span class="">Go to post</span></a>
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-share-2 icon-sm me-2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> <span class="">Share</span></a>
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy icon-sm me-2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="">Copy link</span></a>
+                    @foreach($posts as $post)
+                        <div class="card rounded">
+                            <div class="card-header">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center">
+                                        <img class="avatar-xs rounded-circle"
+                                             src="{{url('storage/'.$post->getAuthor->image ?? 'avatar.png')}}"
+                                             alt="{{$post->getAuthor->first_name ?? '' }}" class="avatar-sm">
+                                        <div class="ms-2">
+                                            <a href="{{ route('read-timeline-post', $post->p_slug) }}">{{$post->p_title ?? '' }}</a>
+                                            <p class="tx-11 text-muted">{{$post->getAuthor->title ?? '' }} {{$post->getAuthor->first_name ?? '' }} {{$post->getAuthor->last_name ?? '' }}</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="card-body">
-                            <p class="mb-3 tx-14">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus minima delectus nemo unde quae recusandae assumenda.</p>
-                            <img class="img-fluid" src="../../../assets/images/photos/img2.jpg" alt="">
-                        </div>
-                        <div class="card-footer">
-                            <div class="d-flex post-actions">
-                                <a href="javascript:;" class="d-flex align-items-center text-muted me-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart icon-md"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                                    <p class="d-none d-md-block ms-2">Like</p>
-                                </a>
-                                <a href="javascript:;" class="d-flex align-items-center text-muted me-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square icon-md"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                                    <p class="d-none d-md-block ms-2">Comment</p>
-                                </a>
-                                <a href="javascript:;" class="d-flex align-items-center text-muted">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-share icon-md"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
-                                    <p class="d-none d-md-block ms-2">Share</p>
-                                </a>
+                            <div class="card-body">
+                                {!! strlen(strip_tags($post->p_content)) > 150 ? substr(strip_tags($post->p_content), 0,150).'...<a href='.$post->p_slug.'>Read more</a>' : strip_tags($post->p_content) !!}
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="card rounded">
-                        <div class="card-header">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div class="d-flex align-items-center">
-                                    <img class="img-xs rounded-circle" src="https://www.nobleui.com/html/template/assets/images/faces/face1.jpg" alt="">
-                                    <div class="ms-2">
-                                        <p>Mike Popescu</p>
-                                        <p class="tx-11 text-muted">5 min ago</p>
-                                    </div>
-                                </div>
-                                <div class="dropdown">
-                                    <a type="button" id="dropdownMenuButton3" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal icon-lg pb-3px"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-                                    </a>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton3">
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-meh icon-sm me-2"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="15" x2="16" y2="15"></line><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg> <span class="">Unfollow</span></a>
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-corner-right-up icon-sm me-2"><polyline points="10 9 15 4 20 9"></polyline><path d="M4 20h7a4 4 0 0 0 4-4V4"></path></svg> <span class="">Go to post</span></a>
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-share-2 icon-sm me-2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> <span class="">Share</span></a>
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy icon-sm me-2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="">Copy link</span></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <p class="mb-3 tx-14">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
-                            <img class="img-fluid" src="../../../assets/images/photos/img1.jpg" alt="">
-                        </div>
-                        <div class="card-footer">
-                            <div class="d-flex post-actions">
-                                <a href="javascript:;" class="d-flex align-items-center text-muted me-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart icon-md"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                                    <p class="d-none d-md-block ms-2">Like</p>
-                                </a>
-                                <a href="javascript:;" class="d-flex align-items-center text-muted me-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square icon-md"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                                    <p class="d-none d-md-block ms-2">Comment</p>
-                                </a>
-                                <a href="javascript:;" class="d-flex align-items-center text-muted">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-share icon-md"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
-                                    <p class="d-none d-md-block ms-2">Share</p>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+                        @endforeach
                 </div>
             </div>
         </div>
-        <!-- middle wrapper end -->
-        <!-- right wrapper start -->
-        <div class="d-none d-xl-block col-xl-3">
-            <div class="row">
-                <div class="col-md-12 grid-margin">
-                    <div class="card rounded">
-                        <div class="">
-                            <div class="modal-header">
-                                <h6 class="tx-11 fw-bolder text-uppercase">December Birthdays</h6>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="row ms-0 me-0">
-                                <a href="javascript:;" class="col-md-4 ps-1 pe-1">
-                                    <figure class="mb-2">
-                                        <img class="img-fluid rounded" src="https://www.nobleui.com/html/template/assets/images/faces/face1.jpg" alt="">
-                                    </figure>
-                                </a>
-                                <a href="javascript:;" class="col-md-4 ps-1 pe-1">
-                                    <figure class="mb-2">
-                                        <img class="img-fluid rounded" src="https://www.nobleui.com/html/template/assets/images/faces/face2.jpg" alt="">
-                                    </figure>
-                                </a>
-                                <a href="javascript:;" class="col-md-4 ps-1 pe-1">
-                                    <figure class="mb-2">
-                                        <img class="img-fluid rounded" src="https://www.nobleui.com/html/template/assets/images/faces/face3.jpg" alt="">
-                                    </figure>
-                                </a>
-                                <a href="javascript:;" class="col-md-4 ps-1 pe-1">
-                                    <figure class="mb-2">
-                                        <img class="img-fluid rounded" src="https://www.nobleui.com/html/template/assets/images/faces/face4.jpg" alt="">
-                                    </figure>
-                                </a>
-                                <a href="javascript:;" class="col-md-4 ps-1 pe-1">
-                                    <figure class="mb-2">
-                                        <img class="img-fluid rounded" src="https://www.nobleui.com/html/template/assets/images/faces/face5.jpg" alt="">
-                                    </figure>
-                                </a>
-                                <a href="javascript:;" class="col-md-4 ps-1 pe-1">
-                                    <figure class="mb-2">
-                                        <img class="img-fluid rounded" src="https://www.nobleui.com/html/template/assets/images/faces/face6.jpg" alt="">
-                                    </figure>
-                                </a>
-                                <a href="javascript:;" class="col-md-4 ps-1 pe-1">
-                                    <figure class="mb-0">
-                                        <img class="img-fluid rounded" src="https://www.nobleui.com/html/template/assets/images/faces/face7.jpg" alt="">
-                                    </figure>
-                                </a>
-                                <a href="javascript:;" class="col-md-4 ps-1 pe-1">
-                                    <figure class="mb-0">
-                                        <img class="img-fluid rounded" src="https://www.nobleui.com/html/template/assets/images/faces/face8.jpg" alt="">
-                                    </figure>
-                                </a>
-                                <a href="javascript:;" class="col-md-4 ps-1 pe-1">
-                                    <figure class="mb-0">
-                                        <img class="img-fluid rounded" src="https://www.nobleui.com/html/template/assets/images/faces/face9.jpg" alt="">
-                                    </figure>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-12 grid-margin">
-                    <div class="card rounded">
-                        <div class="">
-                            <div class="modal-header">
-                                <h6 class="tx-11 fw-bolder text-uppercase">Others in this branch</h6>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
-                                <div class="d-flex align-items-center hover-pointer">
-                                    <img class="img-xs rounded-circle" src="../../../assets/images/faces/face2.jpg" alt="">
-                                    <div class="ms-2">
-                                        <p>Mike Popescu</p>
-                                        <p class="tx-11 text-muted">12 Mutual Friends</p>
-                                    </div>
-                                </div>
-                                <button class="btn btn-icon border-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user-plus"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg></button>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
-                                <div class="d-flex align-items-center hover-pointer">
-                                    <img class="img-xs rounded-circle" src="../../../assets/images/faces/face3.jpg" alt="">
-                                    <div class="ms-2">
-                                        <p>Mike Popescu</p>
-                                        <p class="tx-11 text-muted">12 Mutual Friends</p>
-                                    </div>
-                                </div>
-                                <button class="btn btn-icon border-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user-plus"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg></button>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
-                                <div class="d-flex align-items-center hover-pointer">
-                                    <img class="img-xs rounded-circle" src="../../../assets/images/faces/face4.jpg" alt="">
-                                    <div class="ms-2">
-                                        <p>Mike Popescu</p>
-                                        <p class="tx-11 text-muted">12 Mutual Friends</p>
-                                    </div>
-                                </div>
-                                <button class="btn btn-icon border-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user-plus"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg></button>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
-                                <div class="d-flex align-items-center hover-pointer">
-                                    <img class="img-xs rounded-circle" src="../../../assets/images/faces/face5.jpg" alt="">
-                                    <div class="ms-2">
-                                        <p>Mike Popescu</p>
-                                        <p class="tx-11 text-muted">12 Mutual Friends</p>
-                                    </div>
-                                </div>
-                                <button class="btn btn-icon border-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user-plus"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg></button>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
-                                <div class="d-flex align-items-center hover-pointer">
-                                    <img class="img-xs rounded-circle" src="../../../assets/images/faces/face6.jpg" alt="">
-                                    <div class="ms-2">
-                                        <p>Mike Popescu</p>
-                                        <p class="tx-11 text-muted">12 Mutual Friends</p>
-                                    </div>
-                                </div>
-                                <button class="btn btn-icon border-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user-plus"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg></button>
-                            </div>
-                            <div class="d-flex justify-content-center">
-                                <a class="btn btn-light border-0">View more</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- right wrapper end -->
     </div>
     <div class="modal fade" id="permissionModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
         <div class="modal-dialog modal-lg" role="document">
@@ -412,16 +208,18 @@
                                     <div class="accordion-body text-muted">
                                         <form action="">
                                             <div class="row">
-                                                @foreach($user->roles->first()->permissions as $p)
-                                                    <div class="col-md-3 col-lg-3">
-                                                        <div class="form-check form-checkbox-outline form-check-primary mb-3">
-                                                            <input class="form-check-input" type="checkbox"  checked="">
-                                                            <label class="form-check-label" >
-                                                                {{$p->name ?? ''}}
-                                                            </label>
+                                                @if(count($user->roles) > 0)
+                                                    @foreach($user->roles->first()->permissions as $p)
+                                                        <div class="col-md-3 col-lg-3">
+                                                            <div class="form-check form-checkbox-outline form-check-primary mb-3">
+                                                                <input class="form-check-input" type="checkbox"  checked="">
+                                                                <label class="form-check-label" >
+                                                                    {{$p->name ?? ''}}
+                                                                </label>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                @endforeach
+                                                    @endforeach
+                                                @endif
                                             </div>
                                         </form>
                                     </div>

@@ -130,6 +130,14 @@ Route::group(['prefix'=>'/financials', 'middleware'=>'auth'],function(){
     Route::get('/income', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'showIncome'])->name('income');
     Route::post('/record-income', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'recordIncome'])->name('record-income');
     Route::get('/expense', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'showExpense'])->name('expense');
+    Route::get('/bulk-import', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'showBulkImport'])->name('bulk-import');
+    Route::post('/process-bulk-import', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'processBulkImport'])->name('process-bulk-import');
+    Route::get('/approve-bulk-import', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'approveBulkImport'])->name('approve-bulk-import');
+    Route::get('/view-bulk-import/{batchCode}', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'viewBulkImport'])->name('view-bulk-import');
+    Route::get('/delete-record/{recordId}', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'deleteRecord'])->name('delete-record');
+    Route::get('/discard-record/{batchCode}', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'discardRecord'])->name('discard-record');
+    Route::get('/post-record/{batchCode}', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'postRecord'])->name('post-record');
+
     Route::post('/record-expense', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'recordExpense'])->name('record-expense');
     Route::get('/remittance', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'showRemittance'])->name('remittance');
     Route::get('/show-remittance-collection', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'showRemittanceCollections'])->name('show-remittance-collections');
@@ -142,25 +150,41 @@ Route::group(['prefix'=>'/financials', 'middleware'=>'auth'],function(){
        Route::get('/generate-remittance-report', [App\Http\Controllers\Portal\ReportsController::class, 'generateRemittanceReport'])->name('generate-remittance-report');
    });
 
-    Route::prefix('/marketing')->group(function(){
-        Route::get('/dashboard', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'marketing'])->name('marketing-dashboard');
-        Route::get('/dashboard-filter', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'filterSalesRevenueReportDashboard'])->name('marketing-dashboard-filter');
-        Route::get('/leads', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'showLeads'])->name('leads');
-        Route::post('/leads', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'createLead']);
-        Route::get('/leads/{slug}', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'leadProfile'])->name('lead-profile');
-        Route::post('/leave-lead-note', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'leaveLeadNote'])->name('leave-lead-note');
-        Route::post('/edit-lead-note', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'editLeadNote'])->name('edit-lead-note');
-        Route::post('/delete-lead-note', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'deleteLeadNote'])->name('delete-lead-note');
-        Route::get('/messaging', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'showMessaging'])->name('marketing-messaging');
-        Route::get('/compose-messaging', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'showComposeMessaging'])->name('marketing-compose-messaging');
-        Route::post('/compose-messaging', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'storeMessage']);
-        Route::get('/automations', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'showAutomations'])->name('marketing-automations');
-        Route::get('/create-automation', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'showCreateAutomation'])->name('marketing-create-automation');
-        Route::post('/create-automation', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'storeAutomation']);
-        Route::get('/edit-marketing-automation/{slug}', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'showEditAutomationForm'])->name('edit-marketing-automation');
-        Route::post('/save-marketing-automation-changes', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'editAutomation'])->name('save-marketing-automation-changes');
-    });
+});
 
+Route::prefix('/follow-up')->group(function(){
+    Route::get('/dashboard', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'marketing'])->name('marketing-dashboard');
+    Route::get('/dashboard-filter', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'filterSalesRevenueReportDashboard'])->name('marketing-dashboard-filter');
+    Route::get('/leads', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'showLeads'])->name('leads');
+    Route::get('/bulk-import-leads', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'showBulkImportLeads'])->name('bulk-import-leads');
+    Route::post('/leads', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'createLead']);
+    Route::post('/bulk-lead-import', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'processLeadBulkImport'])->name("bulk-lead-import");
+    Route::get('/manage-bulk-lead-list', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'manageBulkLeadList'])->name("manage-bulk-lead-list");
+    Route::get('/manage-bulk-lead-list/{batchCode}', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'showBulkLeadImportDetails'])->name("view-bulk-lead-details");
+    Route::get('/leads/{slug}', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'leadProfile'])->name('lead-profile');
+    Route::post('/leave-lead-note', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'leaveLeadNote'])->name('leave-lead-note');
+    Route::post('/edit-lead-note', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'editLeadNote'])->name('edit-lead-note');
+    Route::post('/delete-lead-note', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'deleteLeadNote'])->name('delete-lead-note');
+    Route::get('/delete-lead-entry/{recordId}', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'deleteLeadRecord'])->name('delete-lead-record');
+    Route::get('/discard-lead-record/{batchCode}', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'discardLeadRecord'])->name('discard-lead-record');
+    Route::get('/post-lead-record/{batchCode}', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'postLeadRecord'])->name('post-lead-record');
+    #Follow-up
+    Route::get('/schedule-follow-up', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'showScheduleFollowupForm'])->name('schedule-follow-up');
+    Route::get('/schedule-follow-up-preview', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'showScheduleFollowupPreview'])->name('schedule-follow-up-preview');
+    Route::get('/submit-follow-up-schedule', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'processFollowupSchedule'])->name('submit-follow-up-schedule');
+    Route::get('/manage-schedule', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'manageFollowupSchedule'])->name('manage-schedule');
+    Route::get('/manage-schedule/{refCode}', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'showFollowupDetails'])->name('view-followup-details');
+    Route::post('/rate-followup-schedule', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'rateFollowupSchedule'])->name('rate-followup-schedule');
+
+
+    Route::get('/messaging', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'showMessaging'])->name('marketing-messaging');
+    Route::get('/compose-messaging', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'showComposeMessaging'])->name('marketing-compose-messaging');
+    Route::post('/compose-messaging', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'storeMessage']);
+    Route::get('/automations', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'showAutomations'])->name('marketing-automations');
+    Route::get('/create-automation', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'showCreateAutomation'])->name('marketing-create-automation');
+    Route::post('/create-automation', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'storeAutomation']);
+    Route::get('/edit-marketing-automation/{slug}', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'showEditAutomationForm'])->name('edit-marketing-automation');
+    Route::post('/save-marketing-automation-changes', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'editAutomation'])->name('save-marketing-automation-changes');
 });
 
 Route::group(['prefix'=>'/attendance', 'middleware'=>'auth'], function(){
@@ -181,16 +205,21 @@ Route::group(['prefix'=>'workflow', 'middleware'=>'auth'], function(){
 
 Route::group(['prefix'=>'newsfeed', 'middleware'=>'auth'], function(){
    Route::get('/', [App\Http\Controllers\Portal\TimelineController::class, 'showTimeline'])->name('timeline');
+   Route::get('/birthdays', [App\Http\Controllers\Portal\TimelineController::class, 'showBirthdays'])->name('birthdays');
    Route::post('/publish-timeline-post', [App\Http\Controllers\Portal\TimelineController::class, 'storeTimelinePost'])->name('publish-timeline-post');
+   Route::get('/post/{slug}', [App\Http\Controllers\Portal\TimelineController::class, 'readTimelinePost'])->name('read-timeline-post');
 });
 
 Route::group(['prefix'=>'/bulk-sms', 'middleware'=>'auth'],function(){
+
+    Route::get('/test', [App\Http\Controllers\Portal\SMSController::class, 'dateTest']);
     //Route::get('/', [App\Http\Controllers\UserController::class, 'customerDashboard'])->name('customer-dashboard');
     Route::get('/fund-wallet', [App\Http\Controllers\Portal\SMSController::class, 'showTopUpForm'])->name('top-up');
     Route::post('/fund-wallet', [App\Http\Controllers\Portal\SMSController::class, 'processTopUpRequest']);
     Route::get('/fund-wallet/transactions', [App\Http\Controllers\Portal\SMSController::class, 'showTopUpTransactions'])->name('top-up-transactions');
     Route::get('/compose-sms', [App\Http\Controllers\Portal\SMSController::class, 'showComposeMessageForm'])->name('compose-sms');
     Route::get('/preview-message',[App\Http\Controllers\Portal\SMSController::class, 'previewMessage'])->name('preview-message');
+    Route::post('/inline-preview-message',[App\Http\Controllers\Portal\SMSController::class, 'inlinePreviewMessage'])->name('inline-preview-message');
     Route::post('/send-text-message',[App\Http\Controllers\Portal\SMSController::class, 'sendTextMessage'])->name('send-text-message');
 
     Route::get('/schedule-sms', [App\Http\Controllers\Portal\SMSController::class, 'showScheduleSmsForm'])->name('schedule-sms');

@@ -18,9 +18,8 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="text-center mb-5 text-muted">
-                    <a href="index.html" class="d-block auth-logo">
-                        <img src="/assets/images/logo-dark.png" alt="" height="20" class="auth-logo-dark mx-auto">
-                        <img src="/assets/images/logo-light.png" alt="" height="20" class="auth-logo-light mx-auto">
+                    <a href="{{route("login")}}" class="d-block auth-logo">
+                        <img src="/assets/drive/logo/logo-dark.png" alt="" height="74" width="74" class="auth-logo-dark mx-auto">
                     </a>
                     <p class="mt-3">Forgotten password? No need to worry.</p>
                 </div>

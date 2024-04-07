@@ -6,7 +6,10 @@ use App\Models\ChurchBranch;
 use App\Models\Country;
 use App\Models\MaritalStatus;
 use App\Models\ModuleManager;
+use App\Models\Post;
+use App\Models\PostCorrespondingPerson;
 use App\Models\Role;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role as SRole;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -21,6 +24,9 @@ class UserController extends Controller
         $this->maritalstatus = new MaritalStatus();
         $this->modulemanager = new ModuleManager();
         $this->role = new Role();
+
+        $this->post = new Post();
+        $this->postcorrespondingpersons = new PostCorrespondingPerson();
     }
 
     public function customerDashboard(){
@@ -45,13 +51,56 @@ class UserController extends Controller
         ]);
     }
 
+/*
+    public function showTimeline(){
+        $branchId = Auth::user()->branch ?? 1;
+        if(empty($branchId)){
+            abort(404);
+        }
+        $branchPostIds = $this->postcorrespondingpersons->getCorrespondingPostsByBranch(2,$branchId)
+            ->pluck('pcp_post_id')->toArray(); //branch related
+        $individualPosts = $this->postcorrespondingpersons->getCorrespondingPostsByBranch(4,Auth::user()->id)
+            ->pluck('pcp_post_id')->toArray(); //user related
+        $regionalPosts = $this->postcorrespondingpersons->getCorrespondingPostsByBranch(3,Auth::user()->id)
+            ->pluck('pcp_post_id')->toArray(); //regional
+        $postIds = array_merge($branchPostIds, $individualPosts, $regionalPosts);
+
+        return view('timeline.index',[
+            'branches'=>$this->churchbranch->getAllChurchBranches(),
+            'regions'=>$this->region->getRegions(),
+            'users'=>$this->user->getAllBranchUsers($branchId),
+            'posts'=>$this->post->getPostsByIds($postIds),
+        ]);
+    }*/
+
     public function showUserProfile($slug){
         $user = $this->user->getUserBySlug($slug);
+        $branchId = Auth::user()->branch ?? 1;
+        if(empty($branchId)){
+            abort(404);
+        }
         if(!empty($user)){
+            //branch related
+            $branchPostIds = $this->postcorrespondingpersons->getCorrespondingPosts(2,$branchId)
+                ->pluck('pcp_post_id')->toArray();
+            //user related
+            $individualPosts = $this->postcorrespondingpersons->getCorrespondingPosts(4,Auth::user()->id)
+                ->pluck('pcp_post_id')->toArray();
+            //regional
+            $regionId = 1;
+            $regionalPosts = $this->postcorrespondingpersons->getCorrespondingPosts(3,$regionId)
+                ->pluck('pcp_post_id')->toArray();
+            //everyone
+            $everyonePosts = $this->postcorrespondingpersons->getCorrespondingPosts(1,Auth::user()->id)
+                ->pluck('pcp_post_id')->toArray();
+
+            $postIds = array_merge($branchPostIds, $individualPosts, $regionalPosts, $everyonePosts);
+
             return view('administration.profile',[
                 'user'=>$user,
                 'modules'=>$this->modulemanager->getModules(),
-                'roles'=>$this->role->getRoles()
+                'roles'=>$this->role->getRoles(),
+                'posts'=>$this->post->getPostsByIds($postIds),
             ]);
         }else{
             return back();

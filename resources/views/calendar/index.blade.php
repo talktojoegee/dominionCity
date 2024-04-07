@@ -8,7 +8,10 @@
     <link rel="stylesheet" type="text/css" href="{{asset('/assets/fullcalendar/main.min.css')}}">
     <link href="/css/parsley.css" rel="stylesheet" type="text/css" />
     <style>
-        .fc .fc-view-container .fc-view table .fc-body .fc-widget-content .fc-day-grid-container .fc-day-grid .fc-row .fc-content-skeleton table .fc-event-container .fc-day-grid-event.fc-event{
+        a[style*="background-color: grey"] > * {
+            background: grey !important;
+        }
+       /* .fc .fc-view-container .fc-view table .fc-body .fc-widget-content .fc-day-grid-container .fc-day-grid .fc-row .fc-content-skeleton table .fc-event-container .fc-day-grid-event.fc-event{
             padding: 9px 16px;
             border-radius: 20px 20px 20px 0px;
         }
@@ -54,7 +57,7 @@
             color: #4a90e2;
             display: inline-block;
             width: 100%;
-        }
+        }*/
     </style>
 @endsection
 @section('breadcrumb-action-btn')
@@ -83,72 +86,7 @@
         </div>
     @endif
     <div class="row">
-        <div class="col-md-3 col-xl-3">
-            <div class="card">
-                <div class="card-header sidebar-calendar-title">
-                    Calendar
-                </div>
-                <div class="card-body" style="overflow-y: scroll; height: 500px;">
-                    <div data-provide="datepicker-inline" class="bootstrap-datepicker-inline"></div>
-                    <div class="accordion" id="accordionExample">
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="headingOne">
-                                <button class="accordion-button fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                    Filter Appointments
-                                </button>
-                            </h2>
-                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                                <div class="accordion-body">
-                                    <form action="">
-                                        @csrf
-                                        <div class="form-group">
-                                            <div class="form-check form-checkbox-outline form-check-primary mb-3">
-                                                <input class="form-check-input" type="checkbox" id="showAppointments">
-                                                <label class="form-check-label" for="customCheckcolor1">
-                                                    Show Appointments
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="">Location</label>
-                                            <select name="location" id="location" class="form-control">
-                                                <option value="0" selected>All</option>
-                                                @foreach($locations as $loc)
-                                                    <option value="{{$loc->id}}">{{$loc->location_name ?? '' }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="">Appointment Type</label>
-                                            <select name="appointmentType" id="appointmentType" class="form-control">
-                                                <option value="0" selected>All</option>
-                                                @foreach($appointmentTypes as $apt)
-                                                    <option value="{{$apt->id}}">{{$apt->name ?? '' }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="">Appointment Status</label>
-                                            <select name="appointmentType" id="appointmentStatus" class="form-control">
-                                                <option value="0" selected>All</option>
-                                                <option value="1">Booked</option>
-                                                <option value="2">Confirmed</option>
-                                                <option value="3">Cancelled</option>
-                                                <option value="4">Repeat</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group mt-2 d-flex justify-content-center">
-                                            <button id="filterApptBtn" class="btn btn-primary">Filter <i class="bx bxs-filter-alt"></i> </button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-9 col-xl-9">
+        <div class="col-md-12 col-xl-12">
             <div class="card">
                 <div class="card-header">
                     <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#calendar" class="btn btn-primary  mb-3">Add New Event <i class="bx bx-calendar"></i> </a>
@@ -171,153 +109,15 @@
                             <!-- Nav tabs -->
                             <ul class="nav nav-tabs nav-tabs-custom nav-justified" role="tablist">
                                 <li class="nav-item">
-                                    <a class="nav-link active" data-bs-toggle="tab" href="#home1" role="tab">
-                                        <span class="d-block d-sm-none"><i class="fas fa-home"></i></span>
-                                        <span class="d-none d-sm-block">1:1 Session</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="tab" href="#profile1" role="tab">
-                                        <span class="d-block d-sm-none"><i class="far fa-user"></i></span>
-                                        <span class="d-none d-sm-block">Group Session</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
                                     <a class="nav-link" data-bs-toggle="tab" href="#messages1" role="tab">
                                         <span class="d-block d-sm-none"><i class="far fa-envelope"></i></span>
-                                        <span class="d-none d-sm-block">Block</span>
+                                        <span class="d-none d-sm-block">New Event</span>
                                     </a>
                                 </li>
                             </ul>
                             <div class="tab-content p-3 text-muted">
-                                <div class="tab-pane active" id="home1" role="tabpanel">
-                                    <form action="{{route('add-calendar-event')}}" data-parsley-validate="" method="post" id="individualSessionForm">
-                                        @csrf
-                                        <div class="form-group">
-                                            <label for="">Invitee</label>
-                                            <select name="invitee" id="" class="form-control" data-parsley-required-message="Who are you inviting?" required>
-                                                @foreach($clients as $client)
-                                                    <option value="{{$client->id}}">{{$client->first_name ?? '' }} {{$client->last_name ?? '' }}</option>
-                                                @endforeach
-                                            </select>
-                                            <span class="mt-1 d-flex justify-content-end "><a href="javascript:void(0);" data-bs-target="#clientModal" data-bs-toggle="modal">Add New Client</a></span>
-                                            @error('invitee') <i class="text-danger">{{$message}}</i>@enderror
-                                        </div>
-                                        <div class="form-group mt-1">
-                                            <label for="">Appointment Type</label>
-                                            <select name="appointmentType" id="" class="form-control" data-parsley-required-message="Choose an appointment type" required>
-                                                @foreach($appointmentTypes as $type)
-                                                    <option value="{{$type->id}}">{{$type->name ?? '' }} - {{$type->length ?? '' }} minutes </option>
-                                                @endforeach
-                                            </select>
-                                            <span class="mt-1 d-flex justify-content-end "><a href="javascript:void(0);" data-bs-target="#appointmentTypeModal" data-bs-toggle="modal">Add Appointment Type</a></span>
-                                            @error('appointmentType') <i class="text-danger">{{$message}}</i>@enderror
-                                        </div>
-                                        <div class="form-group mt-1">
-                                            <label for="">Contact Type</label>
-                                            <select name="contactType" id="" class="form-control" data-parsley-required-message="Choose contact type" required>
-                                                <option value="1">Video Call</option>
-                                                <option value="2">In Person</option>
-                                                <option value="3">Phone Call</option>
-                                            </select>
-                                            @error('contactType') <i class="text-danger">{{$message}}</i>@enderror
-                                        </div>
-                                        <div class="form-group mt-1">
-                                            <label for="">When</label>
-                                            <input type="datetime-local" name="when" class="form-control when" data-parsley-required-message="When is this event taking place?" required>
-                                            @error(' when') <i class="text-danger">{{$message}}</i> @enderror
-                                        </div>
-                                        <div class="form-group mt-1">
-                                            <label for="">Note</label>
-                                            <textarea name="note" id="note" data-parsley-required-message="Leave a note that best describes it." required placeholder="Leave a note here..." rows="5" style="resize: none" class="form-control"></textarea>
-                                            @error('note') <i class="text-danger">{{$message}}</i> @enderror
-                                            <input type="hidden" name="sessionType" value="1">
-                                        </div>
-                                        <div class="form-group d-flex justify-content-center mt-3">
-                                            <div class="btn-group">
-                                                <button type="submit" class="btn btn-primary  waves-effect waves-light">Add Individual Session <i class="bx bx-right-arrow"></i> </button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
 
-
-
-                                <div class="tab-pane" id="profile1" role="tabpanel">
-                                    <form action="{{route('add-group-calendar-event')}}" data-parsley-validate="" method="post" id="GroupSessionForm">
-                                        @csrf
-                                        <div class="form-group">
-                                            <label for="">Invitee</label>
-                                            <select name="invitees[]" multiple data-parsley-required-message="Select clients for this group session" required class="form-control ">
-                                                @foreach($clients as $client)
-                                                    <option value="{{$client->id}}">{{$client->first_name ?? '' }} {{$client->last_name ?? '' }}</option>
-                                                @endforeach
-                                            </select>
-                                            <span class="mt-1 d-flex justify-content-end "><a href="javascript:void(0);" data-bs-target="#clientModal" data-bs-toggle="modal">Add New Client</a></span>
-                                            @error('invitees') <i class="text-danger">{{$message}}</i>@enderror
-                                        </div>
-                                        <div class="form-group mt-2">
-                                            <label for="">Maximum Number of Attendees</label>
-                                            <input data-parsley-required-message="What's the maximum number this session can take?" required type="number" name="maxAttendees" placeholder="Maximum number of Attendees" value="20" class="form-control">
-                                        </div>
-                                        <div class="form-group mt-2">
-                                            <label for="">Appointment Type</label>
-                                            <select name="appointmentType" data-parsley-required-message="Choose appointment type" required class="form-control">
-                                                @foreach($appointmentTypes as $type)
-                                                    <option value="{{$type->id}}">{{$type->name ?? '' }} - {{$type->length ?? '' }} minutes </option>
-                                                @endforeach
-                                            </select>
-                                            <span class="mt-1 d-flex justify-content-end "><a href="javascript:void(0);" data-bs-target="#appointmentTypeModal" data-bs-toggle="modal">Add Appointment Type</a></span>
-                                            @error('appointmentType') <i class="text-danger">{{$message}}</i>@enderror
-                                            <input type="hidden" name="sessionType" value="2">
-                                        </div>
-                                        <div class="form-group mt-2">
-                                            <label for="">Contact Type</label>
-                                            <select name="contactType" data-parsley-required-message="Choose contact type" required class="form-control">
-                                                <option value="1">Video Call</option>
-                                                <option value="2">In Person</option>
-                                                <option value="3">Phone Call</option>
-                                            </select>
-                                            @error('contactType') <i class="text-danger">{{$message}}</i>@enderror
-                                        </div>
-                                        <div class="form-group mt-2">
-                                            <label for="">Location</label>
-                                            <select name="location" data-parsley-required-message="Where will this event be taking place?" required class="form-control">
-                                                @foreach($locations as $loc)
-                                                    <option value="{{$loc->id}}">{{$loc->location_name ?? '' }}</option>
-                                                @endforeach
-                                            </select>
-                                            @error('location') <i class="text-danger">{{$message}}</i>@enderror
-                                        </div>
-                                        <div class="form-group mt-2">
-                                            <label for="">Room</label>
-                                            <select name="room" data-parsley-required-message="Choose a room for this event" required class="form-control">
-                                                @foreach($rooms as $room)
-                                                    <option value="{{$room->id}}">{{$room->name ?? ''}}</option>
-                                                @endforeach
-                                            </select>
-                                            @error('room') <i class="text-danger">{{$message}}</i>@enderror
-                                        </div>
-                                        <div class="form-group mt-2">
-                                            <label for="">When</label>
-                                            <input type="datetime-local" data-parsley-required-message="When will this event be taking place?" required name="when" class="form-control when">
-                                            @error('when') <i class="text-danger">{{$message}}</i> @enderror
-                                        </div>
-                                        <div class="form-group mt-2">
-                                            <label for="">Note</label>
-                                            <textarea name="note" data-parsley-required-message="Leave a note that best describes it." required placeholder="Leave a note here..." rows="5" style="resize: none" class="form-control"></textarea>
-                                            @error('note') <i class="text-danger">{{$message}}</i> @enderror
-                                        </div>
-                                        <div class="form-group d-flex justify-content-center mt-3">
-                                            <div class="btn-group">
-                                                <button type="submit" class="btn btn-primary  waves-effect waves-light">Add Group Session <i class="bx bx-right-arrow"></i> </button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-
-
-                                <div class="tab-pane" id="messages1" role="tabpanel">
+                                <div class="tab-pane active" id="messages1" role="tabpanel">
                                     <form action="{{route('add-calendar-block-event')}}" data-parsley-validate="" method="post" id="blockSessionForm">
                                         @csrf
                                         <div class="form-group">
@@ -338,7 +138,7 @@
                                         </div>
                                         <div class="form-group d-flex justify-content-center mt-3">
                                             <div class="btn-group">
-                                                <button type="submit" class="btn btn-primary  waves-effect waves-light">Add Block <i class="bx bx-right-arrow"></i> </button>
+                                                <button type="submit" class="btn btn-primary  waves-effect waves-light">Add Event <i class="bx bx-right-arrow"></i> </button>
                                             </div>
                                         </div>
                                     </form>
@@ -523,12 +323,10 @@
 @endsection
 
 @section('extra-scripts')
-    <script src="/assets/libs/select2/js/select2.min.js"></script>
-    <script src="/assets/js/pages/form-advanced.init.js"></script>
     <script type="text/javascript" src="{{asset('/assets/moment/moment.min.js')}}"></script>
     <script type="text/javascript" src="{{asset('/assets/fullcalendar/main.min.js')}}"></script>
     <script src="/assets/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
-    <script src="/js/parsley.js"></script>
+    <!-- .fc-event, .fc-event-dot -->
     <script>
         $(document).ready(function(){
             let calendarEl = document.getElementById('fullcalendar');
@@ -539,7 +337,7 @@
                     center: "title",
                     right: "timeGridDay,timeGridWeek,dayGridMonth"
                 },
-                initialView: 'timeGridWeek',
+                initialView: 'dayGridMonth',
                 events: calendarEvents,
                 eventLimit: true,
                 editable:false,
@@ -562,7 +360,7 @@
                     $('#eventInfoLearnMore').attr('href', info.event.url);
                     //console.log(`${new Date(info.event.startStr).toLocaleDateString()}`);
                     //alert('View: ' + info.view.type);
-                    console.log(info);
+                    //console.log(info);
                     $('#infoModal').modal('show');
                 }
             });

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Portal;
 use App\Http\Controllers\Controller;
 use App\Models\Calendar;
 use App\Models\CashBook;
+use App\Models\CashBookAccount;
 use App\Models\Client;
 use App\Models\Remittance;
 use App\Models\Sale;
@@ -25,6 +26,7 @@ class ReportsController extends Controller
 
 
         $this->cashbook = new CashBook();
+        $this->cashbookaccount = new CashBookAccount();
         $this->remittance = new Remittance();
 
     }
@@ -294,13 +296,16 @@ class ReportsController extends Controller
 
 
     public function showCashbookReport($type){
-        if(empty($type)){
+        $branchId = Auth::user()->branch;
+        if(empty($type) || empty($branchId)){
             session()->flash('error', "Something went wrong. Try again later.");
             return back();
         }
 
+
         $from = date('Y-m-d', strtotime("-30 days"));
         $to = date('Y-m-d');
+        $accounts = $this->cashbookaccount->getBranchAccounts($branchId);
         switch ($type){
             case 'cashbook':
                 return view('reports.cashbook.index',[
@@ -308,6 +313,7 @@ class ReportsController extends Controller
                     'search'=>0,
                     'from'=>$from,
                     'to'=>$to,
+                    'accounts'=>$accounts,
 
                 ]);
             case 'income':
@@ -316,6 +322,7 @@ class ReportsController extends Controller
                     'search'=>0,
                     'from'=>$from,
                     'to'=>$to,
+                    'accounts'=>$accounts,
 
                 ]);
             case 'expense':
@@ -324,6 +331,7 @@ class ReportsController extends Controller
                     'search'=>0,
                     'from'=>$from,
                     'to'=>$to,
+                    'accounts'=>$accounts,
 
                 ]);
             default:
@@ -334,50 +342,60 @@ class ReportsController extends Controller
 
     public function generateCashbookReport(Request $request){
         $branchId = Auth::user()->branch;
+        //return dd($request->all());
+        if(empty($branchId)){
+            abort(404);
+        }
         $this->validate($request,[
             'from'=>'required|date',
             'to'=>'required|date',
-            'type'=>'required'
+            'account'=>'required',
+            'type'=>'required',
         ],[
             'from.required'=>'Choose start date',
             'from.date'=>'Enter a valid date',
             'to.date'=>'Enter a valid date',
             'to.required'=>'Choose end date',
-            'type.required'=>'Something is missing. Contact admin'
+            'account.required'=>'Indicate account',
+            'type.required'=>'Something is missing. Contact admin',
         ]);
         $from = $request->from;
         $to = $request->to;
+        $accounts = $this->cashbookaccount->getBranchAccounts($branchId);
         switch ($request->type){
             case 'cashbook':
                 return view('reports.cashbook.index',[
-                    'transactions'=>$this->cashbook->getCashbookTransactionsByDateRange($from, $to, $branchId),
+                    'transactions'=>$this->cashbook->getCashbookTransactionsByDateRange($from, $to, $branchId, $request->account),
                     //'fxTransactions'=>$this->cashbook->getCashbookFXTransactionsByDateRange($from, $to, $branchId),
                     'defaultCurrency'=>$this->cashbook->getDefaultCurrency(),
                     'search'=>1,
                     'from'=>$from,
                     'to'=>$to,
-                    'balance'=>0
+                    'balance'=>0,
+                    'accounts'=>$accounts
 
                 ]);
             case 'income':
                 return view('reports.income.index',[
-                    'transactions'=>$this->cashbook->getCashbookTransactionsByDateRange($from, $to, $branchId),
+                    'transactions'=>$this->cashbook->getCashbookTransactionsByDateRange($from, $to, $branchId, $request->account),
                     'defaultCurrency'=>$this->cashbook->getDefaultCurrency(),
                     'search'=>1,
                     'from'=>$from,
                     'to'=>$to,
-                    'balance'=>0
+                    'balance'=>0,
+                    'accounts'=>$accounts
 
                 ]);
             case 'expense':
                 return view('reports.expense.index',[
-                    'transactions'=>$this->cashbook->getCashbookTransactionsByDateRange($from, $to, $branchId),
+                    'transactions'=>$this->cashbook->getCashbookTransactionsByDateRange($from, $to, $branchId, $request->account),
                     //'fxTransactions'=>$this->cashbook->getCashbookFXTransactionsByDateRange($from, $to, $branchId),
                     'defaultCurrency'=>$this->cashbook->getDefaultCurrency(),
                     'search'=>1,
                     'from'=>$from,
                     'to'=>$to,
-                    'balance'=>0
+                    'balance'=>0,
+                    'accounts'=>$accounts
 
                 ]);
             default:
@@ -390,17 +408,27 @@ class ReportsController extends Controller
     public function showRemittanceReport(){
         $from = date('Y-m-d', strtotime("-30 days"));
         $to = date('Y-m-d');
+        $branchId = Auth::user()->branch;
+        if(empty($branchId)){
+            abort(404);
+        }
+        //$accounts = $this->cashbookaccount->getBranchAccounts($branchId);
         return view('reports.remittance.index',
             [
                 'defaultCurrency'=>$this->cashbook->getDefaultCurrency(),
                 'search'=>0,
                 'from'=>$from,
                 'to'=>$to,
+                //'accounts'=>$accounts
             ]);
     }
 
     public function generateRemittanceReport(Request $request){
         $branchId = Auth::user()->branch;
+        if(empty($branchId)){
+            abort(404);
+        }
+        //$accounts = $this->cashbookaccount->getBranchAccounts($branchId);
         $this->validate($request,[
             'from'=>'required|date',
             'to'=>'required|date',
@@ -418,6 +446,7 @@ class ReportsController extends Controller
             'search'=>1,
             'from'=>$from,
             'to'=>$to,
+            //'accounts'=>$accounts
 
         ]);
     }

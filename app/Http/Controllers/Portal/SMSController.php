@@ -5,13 +5,18 @@ namespace App\Http\Controllers\Portal;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\ServicesController;
 use App\Http\Traits\SMSServiceTrait;
+use App\Http\Traits\UtilityTrait;
+use App\Models\ActivityLog;
 use App\Models\BulkMessage;
 use App\Models\BulkSmsAccount;
+use App\Models\BulkSmsFrequency;
 use App\Models\CashBookAccount;
+use App\Models\Message;
 use App\Models\PhoneGroup;
 //use App\Models\Tenant;
 use App\Models\SenderId;
 use App\Models\TransactionCategory;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,7 +25,7 @@ use Yabacon\Paystack\Fee;
 
 class SMSController extends Controller
 {
-    use SMSServiceTrait;
+    use SMSServiceTrait, UtilityTrait;
 
     public $api;
     public $baseUrl;
@@ -31,9 +36,10 @@ class SMSController extends Controller
     public $mobileNonDndArray = [], $mobileDndArray = []; //9mobile*/
     public function __construct()
     {
-        $this->adminApiToken = env('SMARTSMS_API_TOKEN'); //"AFlh8eh7ALXfcRxt7RWshxUKt5BrMVtMyvtFfPXO19uQeb4GaNhpEIHHRerm";
+        $this->adminApiToken = env('SMARTSMS_API_TOKEN');
         $this->baseUrl = 'https://app.smartsmssolutions.com/';
-        $this->apiToken = 'HelloWorld';
+        $this->apiToken = env('SMARTSMS_API_TOKEN');
+        //'kwhI2vfGJatjt7uMCCJC3DWfhRafi6aaYnG2Dokbby41qAOue6';
 
         //$this->middleware('auth');
         $this->bulksmsaccount = new BulkSmsAccount();
@@ -44,7 +50,17 @@ class SMSController extends Controller
 
         $this->cashbookaccounts = new CashBookAccount();
         $this->transactioncategory = new TransactionCategory();
+        $this->message = new Message();
 
+    }
+
+    public function dateTest(){
+        $next = $this->getRecurringNextMonth(BulkSmsFrequency::find(10), '12:00');
+        //$next = $this->getRecurringNextWeek(BulkSmsFrequency::find(1));
+        //$timeLot = '10:00:00';
+        //$n = $next;//.' '. $timeLot;
+        return dd($next);
+        //return dd($date);
     }
 
     public function showPhoneGroupForm(){
@@ -165,13 +181,21 @@ class SMSController extends Controller
     }
 
     public function previewMessage(Request $request){
+        //return dd($request->all());
         $this->validate($request, [
             'message'=>'required',
-            'senderId'=>'required'
+            'senderId'=>'required',
+            'type'=>'required'
         ],[
             'message.required'=>'Enter the content of your message in the box provided above.',
             'senderId.required'=>'Select sender ID'
         ]);
+        if($request->type == 2){ //schedule message
+            if(empty($request->timeLot) && empty($request->dateTime) && empty($request->frequency)){
+                session()->flash("error", "Whoops! Choose date & time to schedule SMS");
+                return back();
+            }
+        }
         $list = [];
         if(empty($request->phonegroup) && empty($request->phone_numbers)){
             session()->flash("error", "Whoops! Kindly select the source of your contact or enter phone numbers in the box provided; separating them with comma.");
@@ -200,52 +224,11 @@ class SMSController extends Controller
             $filter = array_unique($list);
             $phone_numbers = implode(",",$filter);
             $persons = count($filter);
-            $no_of_pages = round(strlen($request->senderId.":".$request->message)/160) < 1 ? 1 : round(strlen($request->senderId.":".$request->message)/160);
-            /*$cost = round($no_of_pages*3*$persons);
-            $grandTotal = 0;
-            $airtelCost = 0;
-            $mtnCost = 0;
-            $gloCost = 0;
-            $mobileCost = 0;*/
-            $dnd = 0;
-            $ndnd = 0;
+            $no_of_pages = round(strlen($request->message)/160) < 1 ? 1 : round(strlen($request->message)/160);
 
             try{
                 $batchMax = 500;
-                //$counter = round(count($filter)/$batchMax);
-                $counter = round(count($filter)/$batchMax) <= 0 ? 1 : round(count($filter)/$batchMax);
-                for($i = 0; $i < $counter; $i++){
-                    $slice = array_slice($filter,($batchMax * $i),$batchMax);
-                    $implodeSlice = implode(",",$slice);
-                    $sortedPhoneNumbers = $this->getPhoneInfo($implodeSlice, 3); //$this->service->getPhoneInfo($implodeSlice, 3);
-                    $data = $sortedPhoneNumbers->data;
-                    /*
-                     * Sort phone numbers according to network and DND status
-                     */
-                    $airTelNonDndArray  = $data->{'airtel non-dnd'} ?? [];
-                    $airTelDndArray  = $data->{'airtel dnd'} ?? [];
-                    //$airtelCost += ($no_of_pages * 3.5 * count($airTelNonDndArray)) + ($no_of_pages * 5 * count($airTelDndArray));
-
-                    $mtnNonDndArray  = $data->{'mtn non-dnd'} ?? [];
-                    $mtnDndArray  = $data->{'mtn dnd'} ?? [];
-                    //$mtnCost += ($no_of_pages * 3.5 * count($mtnNonDndArray)) + ($no_of_pages * 5 * count($mtnDndArray));
-
-                    $gloNonDndArray = $data->{'glo non-dnd'} ?? [];
-                    $gloDndArray = $data->{'glo dnd'} ?? [];
-                    //$gloCost += ($no_of_pages * 3.5 * count($gloNonDndArray)) + ($no_of_pages * 5 * count($gloDndArray));
-
-                    $mobileNonDndArray = $data->{'9mobile non-dnd'} ?? [];
-                    $mobileDndArray = $data->{'9mobile dnd'} ?? []; //9mobile
-                    //$mobileCost += ($no_of_pages * 3.5 * count($mobileNonDndArray)) + ($no_of_pages * 5 * count($mobileDndArray));
-
-                    $dnd += (count($airTelDndArray) + count($mtnDndArray) + count($gloDndArray) + count($mobileDndArray));
-                    $ndnd += (count($airTelNonDndArray) + count($mtnNonDndArray) + count($gloNonDndArray) + count($mobileNonDndArray));
-
-                    $unknown = $airtelNonDnd = $data->{'unknown non-dnd'} ?? [];
-
-                }
-                $grandTotal = (($dnd * 5) * $no_of_pages) + (($ndnd * 3.5) * $no_of_pages);
-
+                $grandTotal = $this->getBulkSMSCharge($list, $request->message, $batchMax );
                 return view('bulksms.preview-message',[
                     'cost'=>$grandTotal,
                     'persons'=>$persons,
@@ -253,7 +236,12 @@ class SMSController extends Controller
                     'pages'=>$no_of_pages,
                     'message'=>$request->message,
                     'phone_numbers'=>$phone_numbers,
-                    'senderId'=>$request->senderId
+                    'senderId'=>$request->senderId,
+                    'type'=>$request->type,
+                    'dateTime'=>$request->dateTime ?? null,
+                    'frequency'=>$request->frequency ?? null,
+                    'timeLot'=>$request->timeLot ?? null,
+                    'recurring'=>isset($request->recurring) ? 1 : 0,
                 ]);
             }catch (\Exception $exception){
                 return dd($exception->getMessage());
@@ -263,6 +251,56 @@ class SMSController extends Controller
 
     }
 
+    public function inlinePreviewMessage(Request $request){
+        $this->validate($request, [
+            'message'=>'required',
+            'senderId'=>'required',
+            'client'=>'required',
+            'phone_numbers'=>'required',
+        ],[
+            'message.required'=>'Enter the content of your message in the box provided above.',
+            'senderId.required'=>'Select sender ID'
+        ]);
+        $list = [];
+        if(empty($request->phone_numbers)){
+            session()->flash("error", "Whoops! Kindly select the source of your contact or enter phone numbers in the box provided; separating them with comma.");
+            return back();
+        }else{
+            #Phone numbers
+            if(!empty($request->phone_numbers)){
+                $filtered_numbers = [];
+                $phone_number_array = preg_split("/, ?/",$request->phone_numbers);
+                for($i = 0; $i<count($phone_number_array); $i++){
+                    $number = $this->appendCountryCode($phone_number_array[$i]);
+                    array_push($list,str_replace(' ', '', $number));
+                }
+            }
+            $filter = array_unique($list);
+            $phone_numbers = implode(",",$filter);
+            $persons = count($filter);
+            $no_of_pages = round(strlen($request->message)/160) < 1 ? 1 : round(strlen($request->message)/160);
+            try{
+                $batchMax = 500;
+                $grandTotal = $charge = $this->getBulkSMSCharge($list, $request->message, $batchMax );
+                return view('followup.partial._preview-message',[
+                    'cost'=>$grandTotal,
+                    'persons'=>$persons,
+                    'transactions'=>$this->bulksmsaccount->getBulkSmsTransactions(),
+                    'pages'=>$no_of_pages,
+                    'message'=>$request->message,
+                    'phone_numbers'=>$phone_numbers,
+                    'senderId'=>$request->senderId,
+                    'client'=>$request->client,
+                ]);
+            }catch (\Exception $exception){
+                return dd($exception->getMessage());
+            }
+
+        }
+
+    }
+
+
     public function sendTextMessage(Request $request){
         $this->validate($request,[
             'message'=>'required',
@@ -270,37 +308,82 @@ class SMSController extends Controller
             'pages'=>'required',
             'persons'=>'required',
             'phone_numbers'=>'required',
-            'senderId'=>'required'
+            'senderId'=>'required',
+            'type'=>'required'
         ]);
         try {
-            //return dd($request->all());
             $senderId = $request->senderId;
             $units = round($request->persons);
-            //$url = "https://www.bulksmsnigeria.com/api/v1/sms/create?api_token=".$this->api."&from=JAG&to=".$request->phone_numbers."&body=".$request->message."&dnd=2";
-            //$client = new Client();
-            //$response = $client->get($url);
-            //$senderId, $to, $message, $messageType = 0, $refId
-            //$send = $this->service->sendSmartSms($senderId, $request->phone_numbers, $senderId.":".$request->message, 0, Auth::user()->id);
-            //return dd($send->code);
-            //if(!empty($send->code == 1000)){
+            if(isset($request->type) && ($request->type == 1)){ // instant messaging
+                $send = $this->service->sendSmartSms($senderId, $request->phone_numbers, $request->message, 0, Auth::user()->id);
+                if(!empty($send->code == 1000)){
+                    $this->bulksmsaccount->debitAccount(substr(sha1(time()),27,40), $request->cost, $units);
+                    $this->bulkmessage->setNewMessage($request->message, $request->phone_numbers, $senderId, 1, now(), now(), 0, 0);
+
+                    if($request->thirdParty == 1){
+                        $this->message->saveTextMessage('SMS Message', $request->message, (array)$request->client);
+                        $log = Auth::user()->first_name.' '.Auth::user()->last_name.' sent an SMS';
+                        ActivityLog::registerActivity(1,$request->client,Auth::user()->id, $request->client, 'SMS Sent', $log);
+                        session()->flash("success", "Your text message was sent successfully. Currently awaiting delivery.");
+                        return back();
+                    }
+                    session()->flash("success", "Your text message was sent successfully. Currently awaiting delivery.");
+                    return redirect()->route('compose-sms');
+                }else{
+                    session()->flash("error", "Something went wrong. Please try again later or contact admin.");
+                    return back();
+                }
+            }else{ //schedule message
                 $this->bulksmsaccount->debitAccount(substr(sha1(time()),27,40), $request->cost, $units);
-                $this->bulkmessage->setNewMessage($request->message, $request->phone_numbers, $senderId);
-                session()->flash("success", "Your text message was sent successfully. Currently awaiting delivery.");
-                return redirect()->route('compose-sms');
-            /*}else{
-                session()->flash("error", "Something went wrong. Please try again later or contact admin.");
-                return redirect()->route('compose-sms');
-            }*/
+                if(isset($request->recurring) && ($request->recurring == 1) ){
+                    $frequency = BulkSmsFrequency::getBulkFrequencyById($request->frequency);
+                    if(!empty($frequency)){
+                        switch ($frequency->letter){
+                            case 'd':
+                                $nextScheduleDate = $this->getRecurringNextWeek($frequency);
+                                $nextDate = $nextScheduleDate->format("Y-m-d $request->timeLot");
+                                $this->bulkmessage->setNewMessage($request->message, $request->phone_numbers, $senderId, 0, $nextDate, $nextDate, $frequency->id, 1);
+                            break;
+                            case 'm':
+                                $nextScheduleDate = $this->getRecurringNextMonth($frequency, $request->timeLot);
+                                $this->bulkmessage->setNewMessage($request->message, $request->phone_numbers, $senderId, 0, $nextScheduleDate, $nextScheduleDate, $frequency->id, 1);
+                            break;
+                            case 'o':
+                                //do nothing yet
+                            break;
+                        }
+                        session()->flash("success", "Action successful!");
+                        return back();
+                    }else{
+                        session()->flash("error", "Whoops! Something went wrong.");
+                        return back();
+                    }
+                }else{
+                    $startDate = new \DateTime($request->dateTime);
+                    $this->bulkmessage->setNewMessage($request->message, $request->phone_numbers, $senderId, 0, $startDate, $startDate, null, 0);
+                    session()->flash("success", "Action successful!");
+                    return back();
+                }
+
+            }
+
         }catch (\Exception $exception){
             session()->flash("error", "Something went wrong. Please try again later or contact admin.".$exception);
-            return redirect()->route('compose-sms');
+            return back();
+            //return redirect()->route('compose-sms');
         }
 
     }
 
 
     public function showScheduleSmsForm(){
-        return view('bulksms.schedule-sms');
+        /*
+         * $test = new DateTime('2024-05-01 10:00');
+echo $test->modify('third tuesday ' . $test->format('H:i'))->format('Y-m-d H:i');
+         */
+        return view('bulksms.schedule-sms',[
+            'frequencies'=>BulkSmsFrequency::getBulkSmsFrequencies()
+        ]);
     }
 
     public function showApiInterface(){

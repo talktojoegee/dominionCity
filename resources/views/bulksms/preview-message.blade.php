@@ -133,10 +133,15 @@
                                         <input type="hidden" name="cost" value="{{$cost}}">
                                         <input type="hidden" name="pages" value="{{$pages}}">
                                         <input type="hidden" name="persons" value="{{$persons}}">
+                                        <input type="hidden" name="thirdParty" value="0">
                                         <input type="hidden" name="phone_numbers" value="{{$phone_numbers}}">
+                                        <input type="hidden" name="type" value="{{$type}}">
+                                        <input type="hidden" name="dateTime" value="{{$dateTime}}">
+                                        <input type="hidden" name="frequency" value="{{$frequency}}">
+                                        <input type="hidden" name="timeLot" value="{{$timeLot}}">
+                                        <input type="hidden" name="recurring" value="{{$recurring}}">
                                     @endif
                                 </div>
-                            </div>
                         </form>
                     </div>
                 </div>

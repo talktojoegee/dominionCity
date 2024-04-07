@@ -39,7 +39,9 @@ class CashBook extends Model
         return $this->hasMany(CashBookAccount::class, 'cashbook_account_id', 'cba_id');
     }
 
-    public function addCashBook($branchId, $categoryId, $accountId, $currency, $paymentMethod, $level, $transactionType, $transactionDate, $description, $narration = null, $debit = 0, $credit = 0, $refCode){
+    public function addCashBook($branchId, $categoryId, $accountId, $currency, $paymentMethod, $level,
+                                $transactionType, $transactionDate, $description, $narration = null,
+                                $debit = 0, $credit = 0, $refCode, $month, $year){
         $category = $this->getTransactionCategory($categoryId);
         $cashbook = new CashBook();
         $cashbook->cashbook_branch_id = $branchId;
@@ -53,8 +55,8 @@ class CashBook extends Model
         $cashbook->cashbook_transaction_date = $transactionDate;
         $cashbook->cashbook_description = $description;
         $cashbook->cashbook_narration = $narration;
-        $cashbook->cashbook_month = date('m', strtotime($transactionDate));
-        $cashbook->cashbook_year = date('Y', strtotime($transactionDate));
+        $cashbook->cashbook_month = $month ?? date('m', strtotime($transactionDate));
+        $cashbook->cashbook_year = $year ?? date('Y', strtotime($transactionDate));
         $cashbook->cashbook_debit = $debit;
         $cashbook->cashbook_credit = $credit;
         $cashbook->cashbook_ref_code = $refCode;
@@ -218,10 +220,11 @@ class CashBook extends Model
             ->orderBy('cashbook_id', 'DESC')
             ->get();
     }
-    public function getCashbookTransactionsByDateRange($from, $to, $branchId){
+    public function getCashbookTransactionsByDateRange($from, $to, $branchId, $account){
         $defaultCurrency = $this->getDefaultCurrency();
         return CashBook::whereBetween('cashbook_transaction_date', [$from, $to])
-            ->where('cashbook_branch_id', $branchId)
+            //->where('cashbook_branch_id', $branchId)
+            ->where('cashbook_account_id', $account)
             //->where('cashbook_currency_id', $defaultCurrency->id)
             //->whereMonth('cashbook_transaction_date', date('m'))
             //->whereYear('cashbook_transaction_date', date('Y'))

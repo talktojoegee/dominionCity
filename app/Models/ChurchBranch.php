@@ -72,6 +72,10 @@ class ChurchBranch extends Model
         return ChurchBranch::find($branchId);
     }
 
+    public function getChurchBranchByBranchIds($branchIds){
+        return ChurchBranch::where('cb_id', $branchIds)->get();
+    }
+
     public function getChurchBranchBySlug($slug){
         return ChurchBranch::where('cb_slug', $slug)->first();
     }

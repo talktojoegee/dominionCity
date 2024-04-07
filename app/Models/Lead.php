@@ -30,6 +30,7 @@ class Lead extends Model
     }
     public function addLead(Request $request):Lead{
         $lead = new Lead();
+        $lead->entry_date = $request->date ??  now();
         $lead->added_by = Auth::user()->id;
         $lead->org_id = Auth::user()->org_id;
         $lead->first_name = $request->firstName;
@@ -77,6 +78,11 @@ class Lead extends Model
 
     public function getLeadById($id){
         return Lead::find($id);
+    }
+
+
+    public function getLeadByMonthYear($month, $year){
+        return Lead::where('entry_month', $month)->where('entry_year', $year)->orderBy('id', 'DESC')->get();
     }
 
 

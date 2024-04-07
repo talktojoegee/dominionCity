@@ -1,6 +1,6 @@
 @extends('layouts.master-layout')
 @section('current-page')
-    Appointment Details
+    Event Details
 @endsection
 @section('extra-styles')
     <link rel="stylesheet" href="/css/nprogress.css">
@@ -19,7 +19,7 @@
             <div class="col-xl-12 col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <a href="{{route('show-appointments')}}" class="btn btn-primary  mb-3">All Appointments <i class="bx bxs-timer"></i> </a>
+                        <a href="{{route('show-appointments')}}" class="btn btn-primary  mb-3">All Events <i class="bx bxs-timer"></i> </a>
                     </div>
                 </div>
             </div>
@@ -450,13 +450,13 @@
                         <li class="nav-item">
                             <a class="nav-link active" data-bs-toggle="tab" href="#home1" role="tab">
                                 <span class="d-block d-sm-none"><i class="fas fa-home"></i></span>
-                                <span class="d-none d-sm-block"> Upcoming Appointments</span>
+                                <span class="d-none d-sm-block"> Upcoming Events</span>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="tab" href="#profile1" role="tab">
                                 <span class="d-block d-sm-none"><i class="far fa-user"></i></span>
-                                <span class="d-none d-sm-block">Past Appointments</span>
+                                <span class="d-none d-sm-block">Past Events</span>
                             </a>
                         </li>
                     </ul>
@@ -523,7 +523,7 @@
                                     @endforeach
                                 @else
                                     <li class="event-list text-center">
-                                        There are no upcoming appointments with any of the invitees
+                                        There are no upcoming events with any of the invitees
                                     </li>
                                 @endif
 

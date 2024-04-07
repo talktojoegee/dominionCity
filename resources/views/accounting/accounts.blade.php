@@ -64,6 +64,7 @@
                                             <th class="wd-15p">Account Name</th>
                                             <th class="wd-15p">Account No.</th>
                                             <th class="wd-15p">Type</th>
+                                            <th class="wd-15p">Currency</th>
                                             <th class="wd-15p">Scope</th>
                                             <th class="wd-15p">Balance</th>
                                             <th class="wd-15p">Action</th>
@@ -83,6 +84,9 @@
                                                     @elseif($account->cba_type == 2)
                                                         <span class="badge badge-pill badge-soft-danger font-size-11">Virtual</span>
                                                     @endif
+                                                </td>
+                                                <td>
+                                                    {{$account->getCurrency->name ?? '' }}
                                                 </td>
                                                 <td>
                                                     @if($account->cba_scope == 0)
@@ -143,6 +147,16 @@
                                 <option value="2">Virtual</option>
                             </select>
                             @error('type') <i class="text-danger">{{$message}}</i>@enderror
+                        </div>
+                        <div class="form-group mt-3">
+                            <label for="">Currency</label>
+                            <select name="type" class="form-control" data-parsley-required-message="Assign a currency to this account" required>
+                                <option selected disabled>-- Select currency --</option>
+                                @foreach($currencies as $currency)
+                                 <option value="{{ $currency->id }}">{{ $currency->name ?? '' }}({{ $currency->symbol ?? '' }})</option>
+                                @endforeach
+                            </select>
+                            @error('currency') <i class="text-danger">{{$message}}</i>@enderror
                         </div>
                         <div class="form-group mt-3">
                             <label for="">Account No. <small>(Optional if account type is virtual)</small> </label>

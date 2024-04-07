@@ -41,6 +41,9 @@
                             <div class="card">
                                 <div class="card-body">
                                     <div class="row mb-3">
+                                        <div class="col-md-12 col-sm-12 col-lg-12 mb-3">
+                                            <p><strong class="text-danger" style="color: #ff0000 !important;">Note:</strong> Messages scheduled or sent after 7:00pm will be delivered the next day at about 08:15am. This is due to the time restriction on SMS delivery on the bulk route to MTN</p>
+                                        </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label d-flex justify-content-between">Sender ID
@@ -48,7 +51,7 @@
                                                 </label>
                                                 <select name="senderId" id="senderId" class="form-control select2">
                                                     <option value="SMS Channel" selected>SMS Channel</option>
-                                                    @foreach(Auth::user()->getUserSenderIds->where('status',1) as $id)
+                                                    @foreach(Auth::user()->getUserSenderIds as $id)
                                                         <option value="{{$id->sender_id}}">{{$id->sender_id}}</option>
                                                     @endforeach
                                                 </select>
@@ -57,14 +60,63 @@
                                         </div>
                                     </div>
                                     <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                {{--<input class="form-check-input  form-check-label  form-check form-check-primary mb-3" type="checkbox" id="scheduleLater">--}}
-                                                <label class="" for="formCheckcolor1">
-                                                    Schedule Later <small>(Pick Date & Time)</small>
-                                                </label>
+                                        <div class="col-md-8">
+                                            <div class="form-check form-switch mb-3" dir="ltr" >
+                                                <input class="form-check-input" type="checkbox" name="recurring" id="recurring">
+                                                <label class="form-check-label" for="recurring">Recurring task?</label>
                                             </div>
-                                            <input class="form-control" name="dateTime" type="datetime-local" id="scheduleInput">
+                                            <div id="specific">
+                                                <div class="form-group">
+                                                    <label class="" >
+                                                        Schedule Later <small>(Pick Date & Time)</small>
+                                                    </label>
+                                                </div>
+                                                <input class="form-control" name="dateTime" type="datetime-local" id="scheduleInput">
+                                            </div>
+                                            <div id="recurringValues" class="mt-4">
+                                                <div class="input-group bootstrap-touchspin bootstrap-touchspin-injected">
+                                                    <span class="input-group-btn input-group-prepend">
+                                                        <button class="btn btn-primary bootstrap-touchspin-down" type="button">Choose Day</button>
+                                                    </span>
+                                                    <span class="input-group-addon bootstrap-touchspin-prefix input-group-prepend">
+                                                        <select name="frequency" id="frequency" class="form-control select2">
+                                                                <optgroup label="Once A Week">
+                                                                @foreach($frequencies as $frequency)
+                                                                    @switch($frequency->letter)
+                                                                        @case('d')
+                                                                            <option value="{{ $frequency->id }}">{{$frequency->label ?? '' }}</option>
+                                                                        @break
+                                                                    @endswitch
+                                                                 @endforeach
+                                                                </optgroup>
+                                                                <optgroup label="Monthly">
+                                                                    @foreach($frequencies as $frequency)
+                                                                        @switch($frequency->letter)
+                                                                            @case('m')
+                                                                                <option value="{{ $frequency->id }}">{{$frequency->label ?? '' }}</option>
+                                                                            @break
+                                                                        @endswitch
+                                                                    @endforeach
+                                                                </optgroup>
+                                                                <optgroup label="Others">
+                                                                    @foreach($frequencies as $frequency)
+                                                                        @switch($frequency->letter)
+                                                                            @case('o')
+                                                                                <option value="{{ $frequency->id }}">{{$frequency->label ?? '' }}</option>
+                                                                            @break
+                                                                        @endswitch
+                                                                    @endforeach
+                                                                </optgroup>
+                                                        </select>
+                                                    </span>
+                                                    <span class="input-group-btn input-group-append">
+                                                        <button class="btn btn-primary bootstrap-touchspin-up" type="button">Time</button>
+                                                    </span>
+                                                    <input  type="time" name="timeLot"  class="form-control">
+                                                    <input type="hidden" name="type" value="2"> <!-- Schedule -->
+
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row" id="from-phone-group">
@@ -200,6 +252,9 @@
     <script src="/assets/js/pages/form-advanced.init.js"></script>
     <script>
         $(document).ready(function(){
+            $('#recurringValues').hide();
+            $('#specific').show();
+
             $(document).on('keydown','#message', function() {
                 var leng = $(this).val();
                 $('#character-counter').text(leng.length+1);
@@ -208,13 +263,16 @@
                 var leng = $(this).val();
                 $('#character-counter').text(leng.length+1);
             });
-            /*$(document).on('change', '#scheduleLater', function(e){
+
+            $(document).on('change', '#recurring', function(e){
                 if($(this).is(':checked')){
-                    $('#scheduleInput').show();
+                    $('#recurringValues').show();
+                    $('#specific').hide();
                 }else{
-                    $('#scheduleInput').hide();
+                    $('#recurringValues').hide();
+                    $('#specific').show();
                 }
-            });*/
+            });
         });
     </script>
 @endsection

@@ -56,7 +56,7 @@
                             <a href="#" class="auth-logo-light">
                                 <div class="avatar-md profile-user-wid mb-4">
                                     <span class="avatar-title rounded-circle bg-light">
-                                        <img src="/assets/images/logo-light.svg" alt="" class="rounded-circle" height="34">
+                                        <img src="/assets/drive/logo/logo-dark.png" alt="" class="rounded-circle" height="74" width="74">
                                     </span>
                                 </div>
                             </a>
@@ -64,7 +64,7 @@
                             <a href="{{route('login')}}" class="auth-logo-dark">
                                 <div class="avatar-md profile-user-wid mb-4">
                                     <span class="avatar-title rounded-circle bg-light">
-                                        <img src="/assets/images/logo.svg" alt="" class="rounded-circle" height="34">
+                                        <img src="/assets/drive/logo/logo-dark.png" alt="" class="rounded-circle" height="74" width="74">
                                     </span>
                                 </div>
                             </a>
@@ -99,13 +99,11 @@
                                 </div>
 
                                 <div class="mt-3 d-grid">
-                                    <button class="btn btn-primary waves-effect waves-light" type="submit">Log In</button>
+                                    <button class="btn btn-primary waves-effect waves-light" style="background: #CF1E2D; border: 1px solid #CF1E2D" type="submit">Log In</button>
                                 </div>
 
                                 <div class="mt-4 text-center">
                                     <a href="{{ route('password.request') }}" class="text-muted"><i class="mdi mdi-lock me-1"></i> Forgot your password?</a>
-                                    <br>
-                                    Don't have an account ?  <a href="{{ route('register') }}" class="text-muted"> Register today!</a>
                                 </div>
                             </form>
                         </div>

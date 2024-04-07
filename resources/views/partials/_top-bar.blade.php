@@ -5,19 +5,19 @@
             <div class="navbar-brand-box" style="">
                 <a href="{{route('dashboard')}}" class="logo logo-dark">
                     <span class="logo-sm">
-                        <img src="/assets/images/logo.svg" alt="" height="22">
+                        <img src="/assets/drive/logo/logo-dark.png" alt="{{ env("APP_NAME") }}" height="44" width="44">
                     </span>
                     <span class="logo-lg">
-                        <img src="/assets/images/logo-dark.png" alt="" height="17">
+                       <img src="/assets/drive/logo/logo-dark.png" alt="{{ env("APP_NAME") }}" height="74" width="74">
                     </span>
                 </a>
 
                 <a href="{{route('dashboard')}}" class="logo logo-light">
                     <span class="logo-sm">
-                        <img src="/assets/images/logo-light.svg" alt="" height="22">
+                       <img src="/assets/drive/logo/logo.png" alt="{{ env("APP_NAME") }}" height="44" width="44">
                     </span>
                     <span class="logo-lg">
-                        <img src="{{asset('assets/images/'.Auth::user()->getUserOrganization->logo)}}" alt="" height="64" width="90">
+                       <img src="/assets/drive/logo/logo.png" alt="{{ env("APP_NAME") }}" height="74" width="74">
                     </span>
                 </a>
             </div>
@@ -110,6 +110,7 @@
                     <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
                 </button>
                 <div class="dropdown-menu dropdown-menu-end">
+                    <a class="dropdown-item" href="{{route('user-profile', \Illuminate\Support\Facades\Auth::user()->slug)}}"><i class="bx bx-home-alt font-size-16 align-middle me-1"></i> <span key="t-profile">My Profile</span></a>
                     <a class="dropdown-item" href="{{route('settings')}}"><i class="bx bx-user font-size-16 align-middle me-1"></i> <span key="t-profile">Account Settings</span></a>
                     <a class="dropdown-item" href="{{route('change-password')}}"><i class="bx bx-lock-alt font-size-16 align-middle me-1"></i> <span key="t-lock-screen">Change Password</span></a>
                     <div class="dropdown-divider"></div>

@@ -96,6 +96,7 @@
                                     </div>
                                 </div>
                                 <div class="card-footer text-right d-flex justify-content-center">
+                                    <input type="hidden" name="type" value="1"> <!-- Schedule -->
                                         <button type="submit" class="btn btn-primary w-50">Preview Message <i class="bx bxs-right-arrow"></i> </button>
                                 </div>
                             </div>

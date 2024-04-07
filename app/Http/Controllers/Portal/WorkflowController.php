@@ -34,7 +34,7 @@ class WorkflowController extends Controller
         return view('workflow.index',[
             'persons'=>$this->user->getAllBranchUsers(Auth::user()->branch),
             'currencies'=>$this->currency->getCurrencies(),
-            'workflows'=>$this->post->getAllPersonalPosts(Auth::user()->id),
+            'workflows'=>$this->post->getAllPersonalWorkflow(Auth::user()->id),
             'categories'=>$this->transactioncategory->getBranchCategoriesByType(Auth::user()->branch, 2),
         ]);
     }

@@ -15,15 +15,14 @@
         <li>
             <a href="javascript: void(0);" class="has-arrow waves-effect">
                 <i class="bx bxs-message"></i>
-                <span key="t-crypto"> Bulk SMS </span>
+                <span key="t-bulksms"> Bulk SMS </span>
             </a>
             <ul class="sub-menu" aria-expanded="false">
-                @can('access-bulksms-wallet')<li><a href="{{route('top-up-transactions')}}" key="t-wallet">Wallet</a></li>@endcan
-                @can('send-bulksms')<li><a href="{{route('compose-sms')}}" key="t-wallet">Compose</a></li>@endcan
-                <li><a href="{{route('schedule-sms')}}" key="t-wallet">Schedule</a></li>
-                @can('topup-bulksms')<li><a href="{{route('top-up')}}" key="t-wallet">Top-up</a></li>@endcan
-               @can('bulksms-phonegroup') <li><a href="{{route('phone-groups')}}" key="t-wallet">Phone Group</a></li> @endcan
-                <li><a href="{{route('batch-report')}}" key="t-report">Delivery Report</a></li>
+                @can('topup-bulksms')<li><a href="{{route('top-up')}}" key="t-bulksms">Top-up</a></li>@endcan
+            @can('access-bulksms-wallet')<li><a href="{{route('top-up-transactions')}}" key="t-bulksms">Wallet</a></li>@endcan
+                @can('send-bulksms')<li><a href="{{route('compose-sms')}}" key="t-bulksms">Compose</a></li>@endcan
+                    <li><a href="{{route('schedule-sms')}}" key="t-bulksms">Schedule</a></li>
+               @can('bulksms-phonegroup') <li><a href="{{route('phone-groups')}}" key="t-bulksms">Phone Group</a></li> @endcan
             </ul>
         </li>
         @endcan
@@ -34,10 +33,12 @@
                 <span key="t-crypto"> Follow-up </span>
             </a>
             <ul class="sub-menu" aria-expanded="false">
-                @can('add-client')<li><a href="{{route('clients')}}" key="t-wallet">Add Contact</a></li>@endcan
-                @can('contact-client')<li><a href="{{route('clients')}}" key="t-wallet">Contacts</a></li>@endcan
-                <li><a href="{{route('remittance')}}" key="t-wallet">My Task</a></li>
-                <li><a href="{{route('accounting.accounts')}}" key="t-wallet">Assignment</a></li>
+                <li><a href="{{route('leads')}}" key="t-wallet">Leads</a></li>
+                @can('add-client')<li><a href="{{route('marketing-dashboard')}}" key="t-wallet">Dashboard</a></li>@endcan
+                <li><a href="{{route('marketing-messaging')}}" key="t-wallet">Messaging</a></li>
+            @can('add-client')<li><a href="{{route('schedule-follow-up')}}" key="t-wallet">New Schedule</a></li>@endcan
+            @can('add-client')<li><a href="{{route('manage-schedule')}}" key="t-wallet">Manage Schedule</a></li>@endcan
+
             </ul>
         </li>
         @endcan
@@ -53,7 +54,7 @@
         <li>
             <a href="{{route('show-appointments')}}" class="waves-effect">
                 <i class="bx bx-timer"></i>
-                <span key="t-chat">Appointments</span>
+                <span key="t-chat">Events</span>
             </a>
         </li>
         @can('access-workflow')
@@ -128,6 +129,19 @@
             </ul>
         </li>
         @endcan
+        <li class="menu-title">Bulk Operations</li>
+        @can('access-finance')
+            <li>
+                <a href="javascript: void(0);" class="has-arrow waves-effect">
+                    <i class="bx bx-spreadsheet"></i>
+                    <span key="t-crypto"> Bulk Import </span>
+                </a>
+                <ul class="sub-menu" aria-expanded="false">
+                    @can('access-remittance')<li><a href="{{route('bulk-import')}}" key="t-wallet">Bulk Import</a></li> @endcan
+                    @can('access-remittance')<li><a href="{{route('approve-bulk-import')}}" key="t-wallet">Approve Bulk Import</a></li> @endcan
+                </ul>
+            </li>
+        @endcan
         @can('access-finance-report')
         <li>
             <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -149,15 +163,15 @@
         <li>
             <a href="javascript: void(0);" class="has-arrow waves-effect">
                 <i class="bx bx-cog"></i>
-                <span key="t-crypto">Settings</span>
+                <span key="t-settings">Settings</span>
             </a>
             <ul class="sub-menu" aria-expanded="false">
-                <li><a href="{{route('manage-roles')}}" key="t-wallet">Roles</a></li>
-                <li><a href="{{route('organization')}}" key="t-wallet">Basic</a></li>
-                <li><a href="{{route('settings')}}" key="t-wallet">General </a></li>
-                <li><a href="{{route('branches-settings')}}" key="t-wallet">Branches</a></li>
-                <li><a href="{{route('manage-permissions')}}" key="t-wallet">Permissions</a></li>
-                <li><a href="{{route('branches-settings')}}" key="t-wallet">Branch Assignment</a></li>
+                <li><a href="{{route('manage-roles')}}" key="t-settings">Roles</a></li>
+                <li><a href="{{route('organization')}}" key="t-settings">Basic</a></li>
+                <li><a href="{{route('settings')}}" key="t-settings">General </a></li>
+                <li><a href="{{route('branches-settings')}}" key="t-settings">Branches</a></li>
+                <li><a href="{{route('manage-permissions')}}" key="t-settings">Permissions</a></li>
+                <li><a href="{{route('branches-settings')}}" key="t-settings">Branch Assignment</a></li>
             </ul>
         </li>
         @endcan

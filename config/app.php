@@ -167,6 +167,8 @@ return [
         Illuminate\View\ViewServiceProvider::class,
         Stevebauman\Location\LocationServiceProvider::class,
 
+        Maatwebsite\Excel\ExcelServiceProvider::class,
+
         /*
          * Package Service Providers...
          */
@@ -197,6 +199,7 @@ return [
         'Location' => 'Stevebauman\Location\Facades\Location',
         // 'ExampleClass' => App\Example\ExampleClass::class,
         'Analytics'=>\Spatie\Analytics\AnalyticsFacade::class,
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
     ])->toArray(),
 
 ];

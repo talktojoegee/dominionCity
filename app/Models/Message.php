@@ -31,6 +31,19 @@ class Message extends Model
         return $message;
     }
 
+    public function saveTextMessage($subject, $text, $sentTo){
+        $message = new Message();
+        $message->title = $subject ?? '';
+        $message->org_id = 1;
+        $message->sent_by = Auth::user()->id ?? '';
+        $message->message_type = 2; //text message
+        $message->slug = Str::random(11);
+        $message->content = $text;
+        $message->sent_to = json_encode($this->getIntegerArray($sentTo));
+        $message->save();
+        return $message;
+    }
+
     public function getIntegerArray($arr){
         $values = [];
         for($i = 0; $i<count($arr); $i++){
@@ -40,6 +53,6 @@ class Message extends Model
     }
 
     public function getReceivers($receivers){
-        return Client::whereIn('id', $receivers)->get();
+        return Lead::whereIn('id', $receivers)->get();
     }
 }

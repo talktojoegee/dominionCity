@@ -14,6 +14,9 @@ class CashBookAccount extends Model
     public function getCashbookCreatedBy(){
         return $this->belongsTo(User::class, 'cba_created_by');
     }
+    public function getCurrency(){
+        return $this->belongsTo(Currency::class, 'cba_currency');
+    }
 
 
 
@@ -21,7 +24,7 @@ class CashBookAccount extends Model
         return CashBookAccount::where('cba_name', $name)->where('cba_branch_id', $branchId)->where('cba_type', $type)->first();
     }
 
-    public function addCashBookAccount($type, $scope, $name, $account_no, $amount, $note = 'New Cashbook account created'){
+    public function addCashBookAccount($type, $scope, $name, $account_no, $amount, $note = 'New Cashbook account created', $currency){
         $cashbook = new CashBookAccount();
         $cashbook->cba_branch_id = Auth::user()->branch;
         $cashbook->cba_created_by = Auth::user()->id;
@@ -29,6 +32,7 @@ class CashBookAccount extends Model
         $cashbook->cba_scope = $scope;
         $cashbook->cba_type = $type;
         $cashbook->cba_name = $name;
+        $cashbook->cba_currency = $currency;
         $cashbook->cba_amount = $amount;
         $cashbook->cba_account_no = $account_no;
         $cashbook->cba_note = $note;

@@ -59,8 +59,6 @@ trait SMSServiceTrait{
     public function sendSmartSms($senderId, $to, $message, $messageType, $refId ){
 
         $client = new Client();
-        //$current = Carbon::now();
-        //return date("Y m h:i", strtotime("+30 minutes"));
         $options = [
             'multipart' => [
                 [
@@ -148,6 +146,62 @@ trait SMSServiceTrait{
         $res = $client->sendAsync($request, $options)->wait();
         return json_decode($res->getBody()->getContents());
     }
+
+
+    public function getBulkSMSCharge($list, $message, $maxBatch){
+        $filter = array_unique($list);
+        //$phone_numbers = implode(",",$filter);
+        //$persons = count($filter);
+        $no_of_pages = $this->getNumberOfPages($message);
+
+        $dnd = 0;
+        $ndnd = 0;
+        $counter = $this->getCounterBatch($filter, $maxBatch);
+        for($i = 0; $i < $counter; $i++){
+            $slice = array_slice($filter,($maxBatch * $i),$maxBatch);
+            $implodeSlice = implode(",",$slice);
+            $sortedPhoneNumbers = $this->getPhoneInfo($implodeSlice, 3); //$this->service->getPhoneInfo($implodeSlice, 3);
+            $data = $sortedPhoneNumbers->data;
+            /*
+             * Sort phone numbers according to network and DND status
+             */
+            $airTelNonDndArray  = $data->{'airtel non-dnd'} ?? [];
+            $airTelDndArray  = $data->{'airtel dnd'} ?? [];
+            //$airtelCost += ($no_of_pages * 3.5 * count($airTelNonDndArray)) + ($no_of_pages * 5 * count($airTelDndArray));
+
+            $mtnNonDndArray  = $data->{'mtn non-dnd'} ?? [];
+            $mtnDndArray  = $data->{'mtn dnd'} ?? [];
+            //$mtnCost += ($no_of_pages * 3.5 * count($mtnNonDndArray)) + ($no_of_pages * 5 * count($mtnDndArray));
+
+            $gloNonDndArray = $data->{'glo non-dnd'} ?? [];
+            $gloDndArray = $data->{'glo dnd'} ?? [];
+            //$gloCost += ($no_of_pages * 3.5 * count($gloNonDndArray)) + ($no_of_pages * 5 * count($gloDndArray));
+
+            $mobileNonDndArray = $data->{'9mobile non-dnd'} ?? [];
+            $mobileDndArray = $data->{'9mobile dnd'} ?? []; //9mobile
+            //$mobileCost += ($no_of_pages * 3.5 * count($mobileNonDndArray)) + ($no_of_pages * 5 * count($mobileDndArray));
+
+            $dnd += (count($airTelDndArray) + count($mtnDndArray) + count($gloDndArray) + count($mobileDndArray));
+            $ndnd += (count($airTelNonDndArray) + count($mtnNonDndArray) + count($gloNonDndArray) + count($mobileNonDndArray));
+
+            $unknown = $airtelNonDnd = $data->{'unknown non-dnd'} ?? [];
+
+        }
+        return (($dnd * 5) * $no_of_pages) + (($ndnd * 3.5) * $no_of_pages);
+    }
+
+    public function getNumberOfPages($message){
+        $perPage = 160;
+        return round(strlen($message)/$perPage) < 1 ? 1 : round(strlen($message)/$perPage);
+        //max(round(strlen($message) / $perPage), 1);
+    }
+
+
+    public function getCounterBatch($filter, $maxBatch){
+        return round(count($filter)/$maxBatch) <= 0 ? 1 : round(count($filter)/$maxBatch);
+    }
+
+
 
 }
 

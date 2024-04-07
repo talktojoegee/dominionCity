@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CashBook;
 use App\Models\CashBookAccount;
 use App\Models\CashBookAccountLog;
+use App\Models\Currency;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,6 +18,7 @@ class CashbookController extends Controller
         $this->cashbookaccount = new CashBookAccount();
         $this->cashbook = new CashBook();
         $this->cashbooklog = new CashBookAccountLog();
+        $this->currency = new Currency();
     }
 
 
@@ -25,19 +27,21 @@ class CashbookController extends Controller
     public function showManageAccounts(){
         return view('accounting.accounts',[
             'accounts'=>$this->cashbookaccount->getBranchAccounts(Auth::user()->branch),
+            'currencies'=>$this->currency->getCurrencies()
         ]);
     }
 
     public function addCashBook(Request $request){
-        //return dd($request->all());
         $request->validate([
             "name"=>"required",
             "type"=>"required",
             "scope"=>"required",
+            "currency"=>"required"
         ],[
             'name.required'=>'Enter a name for this category',
             'type.required'=>'What will this account be used to track? Income or expense?',
             'scope.required'=>'What is the scope of this account? Branch, regional or global?',
+            'currency.required'=>'Choose currency'
         ]);
         if($request->type == 1){
             if(empty($request->accountNo)){
@@ -54,7 +58,8 @@ class CashbookController extends Controller
             }
             $accountNo = $request->type == 1 ? $request->accountNo : $this->cashbookaccount->generateVirtualAccountNo();
             $account = $this->cashbookaccount
-                ->addCashBookAccount($request->type, $request->scope, $request->name, $accountNo, $request->amount ?? 0, $request->note);
+                ->addCashBookAccount($request->type, $request->scope, $request->name,
+                    $accountNo, $request->amount ?? 0, $request->note, $request->currency);
             $amount = $request->openingBalance;
             if($amount > 0){
                 //push to cashbook

@@ -24,15 +24,36 @@ class TimelineController extends Controller
         $this->churchbranch = new ChurchBranch();
         $this->region = new Region();
         $this->post = new Post();
+        $this->postcorrespondingpersons = new PostCorrespondingPerson();
     }
 
     public function showTimeline(){
         $branchId = Auth::user()->branch ?? 1;
+        if(empty($branchId)){
+            abort(404);
+        }
+        //branch related
+        $branchPostIds = $this->postcorrespondingpersons->getCorrespondingPosts(2,$branchId)
+            ->pluck('pcp_post_id')->toArray();
+        //user related
+        $individualPosts = $this->postcorrespondingpersons->getCorrespondingPosts(4,Auth::user()->id)
+            ->pluck('pcp_post_id')->toArray();
+        //regional
+        $regionId = 1;
+        $regionalPosts = $this->postcorrespondingpersons->getCorrespondingPosts(3,$regionId)
+            ->pluck('pcp_post_id')->toArray();
+        //everyone
+        $everyonePosts = $this->postcorrespondingpersons->getCorrespondingPosts(1,Auth::user()->id)
+            ->pluck('pcp_post_id')->toArray();
+
+        $postIds = array_merge($branchPostIds, $individualPosts, $regionalPosts, $everyonePosts);
+
         return view('timeline.index',[
             'branches'=>$this->churchbranch->getAllChurchBranches(),
             'regions'=>$this->region->getRegions(),
             'users'=>$this->user->getAllBranchUsers($branchId),
-            'posts'=>$this->post->getAllBranchPosts($branchId),
+            'birthdays'=>$this->user->getCurrentNextBirthdays(),
+            'posts'=>$this->post->getPostsByIds($postIds),
         ]);
     }
 
@@ -54,12 +75,17 @@ class TimelineController extends Controller
         $post = Post::publishPost($userId, $branch, $request->subject, $request->postContent, $request->type,
             0, 76, null, null, 0, $request->to, null);
         $recipient = $request->to;
+        //return dd($request->all());
         switch ($recipient){
+            case 1: //for everyone
+                $userIds = User::pluck('id');
+                $values = json_encode($this->getIntegerArray($userIds));
+                PostCorrespondingPerson::storeDetails($post->p_id, 1, $values);
+                break;
             case 2: //For branch
                 $this->validate($request,[
                    'branches'=>'required',
                 ],['branches.required'=>"Select the church branch(es) concerned"]);
-
                 $values = json_encode($this->getIntegerArray($request->branches));
                 PostCorrespondingPerson::storeDetails($post->p_id, 2, $values);
                 break;
@@ -98,5 +124,42 @@ class TimelineController extends Controller
         }
         session()->flash("success", "Action successful!");
         return back();
+    }
+
+    public function readTimelinePost($slug){
+        $post = $this->post->getPostBySlug($slug);
+        if(empty($post)){
+            abort(404);
+        }
+        $postType = $this->getPostType($post->p_type);
+        $branches = null;
+        $regions = null;
+        $users = null;
+        switch($post->p_scope){
+            case 2:
+                $ids = $this->post->getCorrespondenceByPostId($post->p_id);
+                $branches = $this->churchbranch->getChurchBranchByBranchIds($ids->pcp_target);
+                break;
+            case 4:
+                $ids = $this->post->getCorrespondenceByPostId($post->p_id);
+                $users = $this->user->getUserByIds(json_decode($ids->pcp_target));
+
+        }
+
+        return view('timeline.view',[
+            'post'=>$post,
+            'type'=>$postType,
+            'scope'=>$post->p_scope,
+            'branches'=>$branches,
+            'users'=>$users,
+            'regions'=>$regions
+        ]);
+    }
+
+
+    public function showBirthdays(){
+        return view("timeline.birthdays",[
+            "users"=>$this->user->getAllUsers()
+        ]);
     }
 }

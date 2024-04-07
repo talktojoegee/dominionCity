@@ -91,71 +91,15 @@
                                             </div>
 
                                             <div class="flex-grow-1 overflow-hidden">
-                                                <h5 class="text-truncate font-size-15">{{$post->p_title ?? '' }}</h5>
-                                                <p class="text-muted">Separate existence is a myth. For science, music,
-                                                    sport, etc.</p>
-                                            </div>
-                                        </div>
-                                        <div class="dropdown">
-                                            <a type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown"
-                                               aria-haspopup="true" aria-expanded="false">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                     class="feather feather-more-horizontal icon-lg pb-3px">
-                                                    <circle cx="12" cy="12" r="1"></circle>
-                                                    <circle cx="19" cy="12" r="1"></circle>
-                                                    <circle cx="5" cy="12" r="1"></circle>
-                                                </svg>
-                                            </a>
-                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-                                                <a class="dropdown-item d-flex align-items-center" href="javascript:;">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                         class="feather feather-meh icon-sm me-2">
-                                                        <circle cx="12" cy="12" r="10"></circle>
-                                                        <line x1="8" y1="15" x2="16" y2="15"></line>
-                                                        <line x1="9" y1="9" x2="9.01" y2="9"></line>
-                                                        <line x1="15" y1="9" x2="15.01" y2="9"></line>
-                                                    </svg>
-                                                    <span class="">Unfollow</span></a>
-                                                <a class="dropdown-item d-flex align-items-center" href="javascript:;">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                         class="feather feather-corner-right-up icon-sm me-2">
-                                                        <polyline points="10 9 15 4 20 9"></polyline>
-                                                        <path d="M4 20h7a4 4 0 0 0 4-4V4"></path>
-                                                    </svg>
-                                                    <span class="">Go to post</span></a>
-                                                <a class="dropdown-item d-flex align-items-center" href="javascript:;">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                         class="feather feather-share-2 icon-sm me-2">
-                                                        <circle cx="18" cy="5" r="3"></circle>
-                                                        <circle cx="6" cy="12" r="3"></circle>
-                                                        <circle cx="18" cy="19" r="3"></circle>
-                                                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-                                                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-                                                    </svg>
-                                                    <span class="">Share</span></a>
-                                                <a class="dropdown-item d-flex align-items-center" href="javascript:;">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                         class="feather feather-copy icon-sm me-2">
-                                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                                        <path
-                                                            d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                                                    </svg>
-                                                    <span class="">Copy link</span></a>
+                                                <h5 class="text-truncate font-size-15">
+                                                    <a href="{{ route('read-timeline-post', $post->p_slug) }}">{{$post->p_title ?? '' }}</a>
+                                                </h5>
+                                                <p class="text-muted"> <i class="bx bx-user align-middle text-info me-1"></i> {{ $post->getAuthor->title ?? ''  }} {{ $post->getAuthor->first_name ?? ''  }} {{ $post->getAuthor->last_name ?? ''  }} | <i class="bx bx-calendar align-middle text-danger me-1"></i> {{ date('d M, Y h:i a', strtotime($post->created_at)) }}</p>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="card-body">
-                                        {!! strlen(strip_tags($post->p_content)) > 150 ? substr(strip_tags($post->p_content), 0,150).'...<a href='.$post->p_id.'>Read more</a>' : strip_tags($post->p_content) !!}
+                                        {!! strlen(strip_tags($post->p_content)) > 150 ? substr(strip_tags($post->p_content), 0,150).'...<a href='.$post->p_slug.'>Read more</a>' : strip_tags($post->p_content) !!}
                                     </div>
                                     <div class="card-footer">
                                         <div class="d-flex post-actions">
@@ -167,7 +111,7 @@
                                                     <path
                                                         d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                                                 </svg>
-                                                <p class="d-none d-md-block ms-2">Like</p>
+                                                <span class="d-none d-md-block ms-2">Like</span>
                                             </a>
                                             <a href="javascript:;" class="d-flex align-items-center text-muted me-4">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -177,7 +121,7 @@
                                                     <path
                                                         d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                                                 </svg>
-                                                <p class="d-none d-md-block ms-2">Comment</p>
+                                                <span class="d-none d-md-block ms-2">Comment</span>
                                             </a>
                                         </div>
                                     </div>
@@ -195,6 +139,34 @@
                             <div class="">
                                 <div class="modal-header">
                                     <h6 class="tx-11 fw-bolder text-uppercase">Upcoming Birthdays</h6>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                @foreach($birthdays as $birth)
+                                    <div class="row ms-0 me-0 mb-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-shrink-0 me-3">
+                                                <img class="rounded avatar-sm" src="{{url('storage/'.$birth->image ?? 'avatar.png')}}"
+                                                     alt="{{$birth->first_name ?? '' }}">
+                                            </div>
+                                            <div class="flex-grow-1" style="margin-bottom: 5px;">
+                                                <h6 class="fs-14"><a href="{{ route("user-profile", $birth->slug) }}">{{$birth->title ?? '' }} {{$birth->first_name ?? '' }} {{$birth->last_name ?? '' }}</a></h6>
+                                                <p class="mb-0"> {{ date('d F', strtotime($birth->birth_date)) ?? '' }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                                    <div class="d-flex justify-content-center">
+                                        <a href="{{ route("birthdays") }}" class="btn btn-light border-0">View more</a>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 grid-margin">
+                        <div class="card rounded">
+                            <div class="">
+                                <div class="modal-header">
+                                    <h6 class="tx-11 fw-bolder text-uppercase">Upcoming Events</h6>
                                 </div>
                             </div>
                             <div class="card-body">
@@ -222,42 +194,6 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-12 grid-margin">
-                        <div class="card rounded">
-                            <div class="">
-                                <div class="modal-header">
-                                    <h6 class="tx-11 fw-bolder text-uppercase">Recent Activities</h6>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
-                                    <div class="d-flex align-items-center hover-pointer">
-                                        <img class="img-xs rounded-circle" src="../../../assets/images/faces/face2.jpg"
-                                             alt="">
-                                        <div class="ms-2">
-                                            <p>Mike Popescu</p>
-                                            <p class="tx-11 text-muted">12 Mutual Friends</p>
-                                        </div>
-                                    </div>
-                                    <button class="btn btn-icon border-0">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                             stroke-linecap="round" stroke-linejoin="round"
-                                             class="feather feather-user-plus">
-                                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                            <circle cx="8.5" cy="7" r="4"></circle>
-                                            <line x1="20" y1="8" x2="20" y2="14"></line>
-                                            <line x1="23" y1="11" x2="17" y2="11"></line>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div class="d-flex justify-content-center">
-                                    <a class="btn btn-light border-0">View more</a>
-                                </div>
-
                             </div>
                         </div>
                     </div>

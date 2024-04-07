@@ -163,6 +163,10 @@ class User extends Authenticatable
         return User::find( $id);
     }
 
+    public function getUserByIds($ids){
+        return User::whereIn('id', $ids)->get();
+    }
+
     public function uploadProfilePicture($avatarHandler){
         $filename = $avatarHandler->store('avatars', 'public');
         $avatar = User::find(Auth::user()->id);
@@ -204,6 +208,11 @@ class User extends Authenticatable
 
     public function getAllBranchUsers($branchId){
         return User::where('branch', $branchId)->orderBy('first_name', 'ASC')->get();
+    }
+
+    public function getCurrentNextBirthdays(){
+        $currentMonth = date('m');
+        return User::where('birth_month', '>=', $currentMonth)->whereNotNull('birth_month')->orderBy('birth_month', 'ASC')->take(5)->get();
     }
 
 
@@ -296,3 +305,6 @@ class User extends Authenticatable
     }*/
 
 }
+
+
+

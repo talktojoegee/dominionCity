@@ -63,6 +63,11 @@ class TransactionCategory extends Model
             ->where('tc_type', $type)->orderBy('tc_name', 'ASC')->get();
     }
 
+    public static function getOneBranchCategoryByType($name, $branchId, $type){
+        return TransactionCategory::where('tc_branch_id', $branchId)
+            ->where('tc_type', $type)->where('tc_name', $name)->first();
+    }
+
 
     public function checkNameExistForBranch($name, $branchId, $type){
         return TransactionCategory::where('tc_name', $name)->where('tc_branch_id', $branchId)->where('tc_type', $type)->first();
