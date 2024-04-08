@@ -33,6 +33,10 @@ Route::get('/home', function(){
     return redirect()->route('settings');
 })->name('home');
 
+Route::get('/test-cron',function(){
+    \Illuminate\Support\Facades\Artisan::call("bulksms:send");
+});
+
 Route::group(['middleware'=>'auth'], function(){
     Route::get('/dashboard', [App\Http\Controllers\Portal\DashboardController::class, 'showDashboard'])->name('dashboard');
     Route::get('/church-branches', [App\Http\Controllers\Portal\BranchController::class, 'showChurchBranches'])->name('church-branches');
