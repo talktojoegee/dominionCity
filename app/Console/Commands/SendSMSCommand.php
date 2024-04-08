@@ -28,6 +28,7 @@ class SendSMSCommand extends Command
      * Execute the console command.
      *
      * @return int
+     * @throws \Exception
      */
     public function handle()
     {
@@ -36,34 +37,23 @@ class SendSMSCommand extends Command
         $messages = BulkMessage::getRecurringMessages(); /*BulkMessage::whereDate('next_schedule', '=', $now)
             ->where('recurring_active','=', 1)
             ->where('recurring','=',1)->get();*/
-        echo "Total messages: ".count($messages);
          if(count($messages) > 0){
-             while(true){
                  foreach($messages as $message){
                      $currentDate = new \DateTime(date("Y-m-d"));
                      $scheduledDate = new \DateTime(date("Y-m-d", strtotime($message->next_schedule)));
                      if($currentDate == $scheduledDate){
                          $currentTime = date('H:i', strtotime($now));
                          $messageTime = date('H:i', strtotime($message->next_schedule));
-                         echo "\n Current Time: $currentTime \n";
-                         echo "Message Time: $messageTime \n";
+                         echo "\n Current Time:". $currentTime." | \t Message Time: ".$messageTime." | \t Date:".$currentDate->format('d M, Y')." | \t Status: ".($currentTime === $messageTime ? 'Same' : 'Not same');
                          if($currentTime === $messageTime){
-                             echo "...and same time!";
-                            // if(strtotime($message->next_schedule) >= strtotime(now())){
-                             echo "\n Sending message...\n";
-                                 $this->sendSmartSms($message->sender_id, $message->sent_to, $message->message, 1, $message->batch_code);
-                                 echo "\n message sent \n";
-                                 if($message->recurring == 0){
-                                     $message->recurring_active = 0;
-                                     $message->save();
-                                 }
-                                 echo "Running...\n";
-                             //}
+                             $this->sendSmartSms($message->sender_id, $message->sent_to, $message->message, 1, $message->batch_code);
+                             if($message->recurring == 0){
+                                 $message->recurring_active = 0;
+                                 $message->save();
+                             }
                          }
                      }
                  }
-                 \sleep(55);
-            }
 
          }
 

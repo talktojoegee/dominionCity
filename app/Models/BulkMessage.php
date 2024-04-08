@@ -41,6 +41,6 @@ class BulkMessage extends Model
 
     public static function getRecurringMessages(){
 
-        return BulkMessage::where("recurring", 1)->where("recurring_active",1)->orderBy('id', 'DESC')->get();
+        return BulkMessage::where("recurring", 1)/*->where("recurring_active",1)*/->orderBy('id', 'DESC')->get();
     }
 }

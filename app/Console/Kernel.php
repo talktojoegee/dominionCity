@@ -24,9 +24,10 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
         $schedule->command('bulksms:send')
             ->everyMinute()
+            ->appendOutputTo("scheduler-output.log");
             //->withoutOverlapping()
-            ->runInBackground();
-        Artisan::call ('bulksms:send');
+            //->runInBackground();
+        //Artisan::call ('bulksms:send');
     }
 
     /**
