@@ -242,6 +242,7 @@ class SMSController extends Controller
                     'frequency'=>$request->frequency ?? null,
                     'timeLot'=>$request->timeLot ?? null,
                     'recurring'=>isset($request->recurring) ? 1 : 0,
+                    'phoneGroup'=>$request->phonegroup ?? null,
                 ]);
             }catch (\Exception $exception){
                 return dd($exception->getMessage());
@@ -318,7 +319,8 @@ class SMSController extends Controller
                 $send = $this->service->sendSmartSms($senderId, $request->phone_numbers, $request->message, 0, Auth::user()->id);
                 if(!empty($send->code == 1000)){
                     $this->bulksmsaccount->debitAccount(substr(sha1(time()),27,40), $request->cost, $units);
-                    $this->bulkmessage->setNewMessage($request->message, $request->phone_numbers, $senderId, 1, now(), now(), 0, 0);
+                    $this->bulkmessage->setNewMessage($request->message, $request->phone_numbers,
+                        $senderId, 1, now(), now(), 0, 0, null);
 
                     if($request->thirdParty == 1){
                         $this->message->saveTextMessage('SMS Message', $request->message, (array)$request->client);
@@ -342,11 +344,13 @@ class SMSController extends Controller
                             case 'd':
                                 $nextScheduleDate = $this->getRecurringNextWeek($frequency);
                                 $nextDate = $nextScheduleDate->format("Y-m-d $request->timeLot");
-                                $this->bulkmessage->setNewMessage($request->message, $request->phone_numbers, $senderId, 0, $nextDate, $nextDate, $frequency->id, 1);
+                                $this->bulkmessage->setNewMessage($request->message, $request->phone_numbers,
+                                    $senderId, 0, $nextDate, $nextDate, $frequency->id, 1, $request->phoneGroup);
                             break;
                             case 'm':
                                 $nextScheduleDate = $this->getRecurringNextMonth($frequency, $request->timeLot);
-                                $this->bulkmessage->setNewMessage($request->message, $request->phone_numbers, $senderId, 0, $nextScheduleDate, $nextScheduleDate, $frequency->id, 1);
+                                $this->bulkmessage->setNewMessage($request->message, $request->phone_numbers, $senderId, 0,
+                                    $nextScheduleDate, $nextScheduleDate, $frequency->id, 1, $request->phoneGroup);
                             break;
                             case 'o':
                                 //do nothing yet
@@ -360,7 +364,8 @@ class SMSController extends Controller
                     }
                 }else{
                     $startDate = new \DateTime($request->dateTime);
-                    $this->bulkmessage->setNewMessage($request->message, $request->phone_numbers, $senderId, 0, $startDate, $startDate, null, 0);
+                    $this->bulkmessage->setNewMessage($request->message, $request->phone_numbers, $senderId, 0,
+                        $startDate, $startDate, null, 0, $request->phoneGroup);
                     session()->flash("success", "Action successful!");
                     return back();
                 }

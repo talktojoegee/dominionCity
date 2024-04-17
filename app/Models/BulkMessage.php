@@ -12,7 +12,8 @@ class BulkMessage extends Model
 {
     use HasFactory;
 
-    public function setNewMessage($msg, $phone_numbers, $senderId, $status, $startDate, $endDate, $frequency, $recurring){
+    public function setNewMessage($msg, $phone_numbers, $senderId, $status, $startDate,
+                                  $endDate, $frequency, $recurring, $phoneGroup){
         $batchCode = Str::random(11);
         $message = new BulkMessage();
         $message->user_id = Auth::user()->id;
@@ -28,6 +29,7 @@ class BulkMessage extends Model
         $message->recurring = $recurring;
         $message->next_schedule = $endDate;
         $message->start_date = $startDate;
+        $message->phone_group = $phoneGroup ?? null;
         $message->save();
     }
 

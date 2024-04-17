@@ -50,6 +50,10 @@ class User extends Authenticatable
     public function getUserCountry(){
         return $this->belongsTo(Country::class, 'country_id');
     }
+
+    public function getUserActivityLogs(){
+        return $this->hasMany(ActivityLog::class, 'user_id')->orderBy('id', 'DESC');
+    }
     public function getUserState(){
         return $this->belongsTo(State::class, 'state_id');
     }
@@ -136,19 +140,24 @@ class User extends Authenticatable
         return $user;
     }
 
-    public function archiveUser($userId){
+    public function archiveUser($userId, $status){
         $user = User::find($userId);
-        $user->status = 3; //supposed to be deleted | we're archiving instead
+        $user->status = $status; //Deactivated || supposed to be deleted | we're archiving instead |
         $user->save();
     }
 
     public function updateUserAccount(Request $request):User{
-        $user = User::find(Auth::user()->id);
+        $user = User::find($request->userId);
+        $user->title = $request->title;
         $user->first_name = $request->firstName;
         $user->last_name = $request->lastName;
-        $user->cellphone_no = $request->cellphoneNumber;
-        $user->state_id = $request->state;
-        $user->country_id = $request->country;
+        $user->cellphone_no = $request->mobileNo;
+        $user->pastor = isset($request->pastor) ? 1 : 0;
+        $user->gender = isset($request->gender) ? 1 : 0;
+        $user->country_id = $request->nationality;
+        $user->address_1 = $request->presentAddress;
+        $user->marital_status = $request->maritalStatus;
+        $user->occupation = $request->occupation;
         $user->save();
         return $user;
     }
@@ -167,9 +176,9 @@ class User extends Authenticatable
         return User::whereIn('id', $ids)->get();
     }
 
-    public function uploadProfilePicture($avatarHandler){
+    public function uploadProfilePicture($avatarHandler, $userId){
         $filename = $avatarHandler->store('avatars', 'public');
-        $avatar = User::find(Auth::user()->id);
+        $avatar = User::find($userId);
         if($avatar->image != 'avatars/avatar.png'){
             $this->deleteFile($avatar->image); //delete file first
         }
@@ -195,7 +204,7 @@ class User extends Authenticatable
     }
 
     public function getAllOrganizationUsers(){
-        return User::where('org_id', Auth::user()->org_id)->where('status', '!=', 3)->orderBy('first_name', 'ASC')->get();
+        return User::where('org_id', Auth::user()->org_id)->/*where('status', '!=', 3)->*/orderBy('first_name', 'ASC')->get();
     }
 
     public function getUserBySlug($slug){

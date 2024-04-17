@@ -2,14 +2,17 @@
 
 namespace App\Console\Commands;
 
-use App\Http\Traits\SMSServiceTrait;
+use App\Http\Traits\UtilityTrait;
 use App\Models\BulkMessage;
+use App\Models\BulkSmsFrequency;
+use App\Models\BulkSmsRecurringLog;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 
 class SendSMSCommand extends Command
 {
+    use UtilityTrait;
     /**
      * The name and signature of the console command.
      *
@@ -50,6 +53,40 @@ class SendSMSCommand extends Command
                              if($message->recurring == 0){
                                  $message->recurring_active = 0;
                                  $message->save();
+                             }else{
+                                 //For recurring messages
+                                 if(!is_null($message->bulk_frequency)){
+                                     $frequency = BulkSmsFrequency::getBulkFrequencyById($message->bulk_frequency);
+                                     if(!empty($frequency)){
+                                         switch ($frequency->letter){
+                                             case 'd':
+                                                 $timeLot = date('h:i', strtotime($message->next_schedule));
+                                                 $nextScheduleDate = $this->getRecurringNextWeek($frequency);
+                                                 $nextDate = $nextScheduleDate->format("Y-m-d $timeLot");
+                                                 $message->recurring_active = 1;
+                                                 $message->next_schedule = $nextDate;
+                                                 $message->save();
+                                                 //Log
+                                                BulkSmsRecurringLog::newSmsLog($message->id, $message->message,
+                                                    $message->sent_to, $message->batch_code);
+                                                 break;
+                                             case 'm':
+                                                 $timeLot = date('h:i', strtotime($message->next_schedule));
+                                                 $nextScheduleDate = $this->getRecurringNextMonth($frequency, $timeLot);
+                                                 $nextDate = $nextScheduleDate->format("Y-m-d $timeLot");
+                                                 $message->recurring_active = 1;
+                                                 $message->next_schedule = $nextDate;
+                                                 $message->save();
+                                                 //Log
+                                                 BulkSmsRecurringLog::newSmsLog($message->id, $message->message,
+                                                     $message->sent_to, $message->batch_code);
+                                                 break;
+                                             case 'o':
+                                                 //do nothing yet
+                                                 break;
+                                         }
+                                     }
+                                 }
                              }
                          }
                      }
@@ -58,6 +95,8 @@ class SendSMSCommand extends Command
          }
 
     }
+
+
 
     public function sendSmartSms($senderId, $to, $message, $messageType, $refId ){
 

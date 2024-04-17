@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
@@ -54,12 +55,21 @@ class LoginController extends Controller
         $user = $this->user->getUserByEmail($request->email);
         if(!empty($user)){
             if(Auth::attempt(['email'=>$request->email, 'password'=>$request->password], $request->remember)){
+                if($user->status == 2){
+                    $log = $user->first_name." ".$user->last_name." tried logging in.";
+                    ActivityLog::registerActivity($user->org_id, null, $user->id, null, 'Login attempt', $log);
+                    Auth::logout();
+                    session()->flash("error", " Your account is no longer active. Kindly contact admin.");
+                    return back();
+                }
                 if(Auth::user()->is_admin == 2){
+                    $log = $user->first_name." ".$user->last_name." logged in successfully.";
+                    ActivityLog::registerActivity($user->org_id, null, $user->id, null, 'New login', $log);
                     return redirect()->route('user-profile', $user->slug);
-                    //return redirect()->route('timeline');
                 }else{
+                    $log = $user->first_name." ".$user->last_name." logged in successfully.";
+                    ActivityLog::registerActivity($user->org_id, null, $user->id, null, 'New login', $log);
                     return redirect()->route('user-profile', $user->slug);
-                   // return redirect()->route('timeline');
                 }
 
             }else{

@@ -78,14 +78,6 @@
         <li>
             <a href="{{route('pastors')}}" class="waves-effect">
                 <i class="bx bxs-user-badge"></i>
-                <span key="t-chat">Pastors</span>
-            </a>
-        </li>
-        @endcan
-        @can('access-users')
-        <li>
-            <a href="{{route('clients')}}" class="waves-effect">
-                <i class="bx bxs-user"></i>
                 <span key="t-chat">Users</span>
             </a>
         </li>

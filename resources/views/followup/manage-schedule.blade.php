@@ -8,48 +8,6 @@
     <link href="/assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
     <link href="/assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
     <link href="/assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
-    <style>
-        .dash-icon{
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            margin: 0 auto;
-            line-height: 50px;
-            position: relative;
-            background: #e3e6f9;
-            z-index: 1;
-            text-align: center;
-        }
-        .dash-icon i {
-            font-size: 30px;
-            text-align: center;
-            vertical-align: middle;
-        }
-        .dash-icon.text-secondary1 {
-            background: rgba(36, 228, 172, 0.2);
-        }
-        .text-secondary1 {
-            color: #24e4ac !important;
-        }
-        .text-orange {
-            color: #ec5444 !important;
-        }
-        .dash-icon.text-orange {
-            background: rgba(236, 84, 68, 0.2);
-        }
-        .text-secondary {
-            color: #9c52fd !important;
-        }
-        .dash-icon.text-secondary {
-            background: rgba(156, 82, 253, 0.2);
-        }
-        .text-warning {
-            color: #ffa70b !important;
-        }
-        .dash-icon.text-warning {
-            background: rgba(255, 167, 11, 0.2);
-        }
-    </style>
 @endsection
 @section('breadcrumb-action-btn')
 

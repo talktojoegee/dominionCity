@@ -140,6 +140,7 @@
                                         <input type="hidden" name="frequency" value="{{$frequency}}">
                                         <input type="hidden" name="timeLot" value="{{$timeLot}}">
                                         <input type="hidden" name="recurring" value="{{$recurring}}">
+                                        <input type="hidden" name="phoneGroup" value="{{$phoneGroup}}">
                                     @endif
                                 </div>
                         </form>
