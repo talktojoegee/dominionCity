@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class Lead extends Model
@@ -83,6 +84,19 @@ class Lead extends Model
 
     public function getLeadByMonthYear($month, $year){
         return Lead::where('entry_month', $month)->where('entry_year', $year)->orderBy('id', 'DESC')->get();
+    }
+
+    public function getTotalLeadsByDateRange($startDate, $endDate){
+        return Lead::select(
+            DB::raw("DATE_FORMAT(entry_date, '%m-%Y') monthYear"),
+            DB::raw("YEAR(entry_date) year, MONTH(entry_date) month"),
+            DB::raw("COUNT(id) total"),
+            'entry_date',
+        )->whereBetween('entry_date', [$startDate, $endDate])
+            //->where('a_branch_id', Auth::user()->branch)
+            ->orderBy('month', 'ASC')
+            ->groupby('year','month')
+            ->get();
     }
 
 

@@ -20,7 +20,7 @@
             <div class="col-xl-12 col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <a href="{{ url()->previous() }}" class="btn btn-secondary "> <i
+                        <a href="{{ route('workflow') }}" class="btn btn-secondary "> <i
                                 class="bx bx bxs-left-arrow"></i> Go back</a>
                         @if(in_array(Auth::user()->id, $authIds))
                         <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#declineModal_" class="btn btn-danger ">  Decline <i
@@ -220,7 +220,7 @@
                                                                 </div>
                                                                 <div class="flex-grow-1">
                                                                     <h5 class="font-size-14 mb-1">{{$trail->getUser->title ?? '' }} {{$trail->getUser->first_name ?? '' }} {{$trail->getUser->last_name ?? '' }} <small
-                                                                            class="text-muted float-end">{{\Carbon\Carbon::parse($trail->created_at)->diffForHumans()}}</small></h5>
+                                                                            class="text-muted float-end">{{ date('d M, Y h:ia', strtotime($trail->updated_at)) }}</small></h5>
                                                                     <p class="text-muted">
                                                                         {{$trail->ap_comment ?? '' }}
                                                                     </p>

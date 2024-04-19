@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class BulkMessage extends Model
@@ -44,5 +45,19 @@ class BulkMessage extends Model
     public static function getRecurringMessages(){
 
         return BulkMessage::where("recurring", 1)/*->where("recurring_active",1)*/->orderBy('id', 'DESC')->get();
+    }
+
+    public function getTotalSMSSentByDateRange($startDate, $endDate){
+        return BulkMessage::select(
+            DB::raw("DATE_FORMAT(next_schedule, '%m-%Y') monthYear"),
+            DB::raw("YEAR(next_schedule) year, MONTH(next_schedule) month"),
+            DB::raw("LENGTH(sent_to) - LENGTH(REPLACE(sent_to, ',', '')) + 1 total"),
+            'next_schedule',
+            //- CHAR_LENGTH(REPLACE(sent_to, ',', '')) + 1
+        )->whereBetween('next_schedule', [$startDate, $endDate])
+            //->where('a_branch_id', Auth::user()->branch)
+            ->orderBy('month', 'ASC')
+            ->groupby('year','month')
+            ->get();
     }
 }

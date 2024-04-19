@@ -66,7 +66,7 @@
                                 </div>
                                 <div class="col-auto mb-0" >
                                     <div class="dash-icon text-orange" >
-                                        <i class="bx bxs-book-open"></i>
+                                        <i class="bx bxs-user-badge"></i>
                                     </div>
                                 </div>
                             </div>
@@ -84,7 +84,7 @@
                                 </div>
                                 <div class="col-auto mb-0" >
                                     <div class="dash-icon text-secondary" >
-                                        <i class="bx bx-notepad"></i>
+                                        <i class="bx bxs-user-badge"></i>
                                     </div>
                                 </div>
                             </div>
@@ -102,7 +102,7 @@
                                 </div>
                                 <div class="col-auto mb-0" >
                                     <div class="dash-icon text-warning" >
-                                        <i class="bx bx-hide"></i>
+                                        <i class="bx bxs-user-badge"></i>
                                     </div>
                                 </div>
                             </div>
@@ -118,6 +118,7 @@
                         <a href="{{route('add-new-pastor')}}"  class="btn btn-primary  mb-3">Add New Pastor <i class="bx bxs-plus-circle"></i> </a>
                     </div>
                     <div class="card-body">
+                        <p><strong class="text-danger">Note:</strong> Your account currently has a total of <code>{{ number_format($users->count() ) }} </code>users</p>
                         <div class="row">
                             <div class="col-md-12 col-lx-12">
                                 <div class="table-responsive mt-3">

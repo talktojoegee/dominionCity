@@ -3,10 +3,15 @@
 namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
+use App\Models\Attendance;
+use App\Models\BulkMessage;
 use App\Models\Calendar;
 use App\Models\CashBook;
 use App\Models\CashBookAccount;
 use App\Models\Client;
+use App\Models\Lead;
+use App\Models\LeadFollowupScheduleDetail;
+use App\Models\LeadFollowupScheduleMaster;
 use App\Models\Remittance;
 use App\Models\Sale;
 use App\Models\User;
@@ -28,7 +33,36 @@ class ReportsController extends Controller
         $this->cashbook = new CashBook();
         $this->cashbookaccount = new CashBookAccount();
         $this->remittance = new Remittance();
+        $this->lead = new Lead();
+        $this->calendar = new Calendar();
+        $this->attendance = new Attendance();
+        $this->leadfollowupmaster = new LeadFollowupScheduleMaster();
+        $this->leadfollowupdetail = new LeadFollowupScheduleDetail();
+        $this->bulkmessage = new BulkMessage();
 
+    }
+
+    public function test(){
+        $start = '2024-01-01';
+        $end = '2024-04-18';
+        //$this->attendance->getTotalAttendanceByDateRange($start, $end) | perfect
+        //$this->lead->getTotalLeadsByDateRange($start, $end)
+        //$masterIds = $this->leadfollowupmaster->getLeadFollowupMasterIdsByDateRange($start, $end);
+        //$this->leadfollowupdetail->getTotalLeadFollowupDetailsByIds($master)
+        //return dd($master);
+        return dd($this->bulkmessage->getTotalSMSSentByDateRange($start, $end));
+    }
+
+    public function showFollowupDashboardStatistics(){
+        $start = date('Y-m-d', strtotime("-90 days"));
+        $end = date('Y-m-d');
+        $masterIds = $this->leadfollowupmaster->getLeadFollowupMasterIdsByDateRange($start, $end);
+        return response()->json([
+            //'sms'=>$this->attendance->getThisYearAttendanceStat('a_no_men'),
+            'followup'=>$this->leadfollowupdetail->getTotalLeadFollowupDetailsByIds($masterIds),
+            'leads'=>$this->lead->getTotalLeadsByDateRange($start, $end),
+            'attendance'=>$this->attendance->getTotalAttendanceByDateRange($start, $end),
+        ],200);
     }
 
     public function showAppointmentReports(){

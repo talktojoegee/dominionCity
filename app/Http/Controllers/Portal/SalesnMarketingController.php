@@ -7,6 +7,7 @@ use App\Http\Traits\OkraOpenBankingTrait;
 use App\Imports\BulkCashbookImportDetailImport;
 use App\Imports\BulkImportLead;
 use App\Models\ActivityLog;
+use App\Models\Attendance;
 use App\Models\Automation;
 use App\Models\BulkCashbookImportDetail;
 use App\Models\BulkCashbookImportMaster;
@@ -67,6 +68,7 @@ class SalesnMarketingController extends Controller
         $this->leadbulkimportdetail = new LeadBulkImportDetail();
         $this->leadfollowupmaster = new LeadFollowupScheduleMaster();
         $this->leadfollowupdetail = new LeadFollowupScheduleDetail();
+        $this->attendance = new Attendance();
     }
 
     public function showAllProducts()
@@ -345,8 +347,20 @@ class SalesnMarketingController extends Controller
             'search'=>0,
             'from'=>now(),
             'to'=>now(),
-            'sales'=>$this->sale->getAllOrgSales(),
+            //'sales'=>$this->sale->getAllOrgSales(),
         ]);
+    }
+
+    public function showFollowupDashboardStatistics(){
+        $start = date('Y-m-d', strtotime("-90 days"));
+        $end = date('Y-m-d');
+        $masterIds = $this->leadfollowupmaster->getLeadFollowupMasterIdsByDateRange($start, $end);
+        return response()->json([
+            //'sms'=>$this->attendance->getThisYearAttendanceStat('a_no_men'),
+            'followup'=>$this->leadfollowupdetail->getTotalLeadFollowupDetailsByIds($masterIds),
+            'leads'=>$this->lead->getTotalLeadsByDateRange($start, $end),
+            'attendance'=>$this->attendance->getTotalAttendanceByDateRange($start, $end),
+        ],200);
     }
     public function filterSalesRevenueReportDashboard(Request $request){
         $this->validate($request, [

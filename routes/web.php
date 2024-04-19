@@ -33,9 +33,11 @@ Route::get('/home', function(){
     return redirect()->route('settings');
 })->name('home');
 
-Route::get('/test-cron',function(){
+/*Route::get('/test-cron',function(){
     \Illuminate\Support\Facades\Artisan::call("bulksms:send");
-});
+});*/
+
+Route::get("/test-report", [App\Http\Controllers\Portal\ReportsController::class, 'test']);
 
 Route::group(['middleware'=>'auth'], function(){
     Route::get('/dashboard', [App\Http\Controllers\Portal\DashboardController::class, 'showDashboard'])->name('dashboard');
@@ -253,6 +255,7 @@ Route::group(['prefix'=>'/reports', 'middleware'=>'auth'],function(){
     Route::get('/practitioners', [App\Http\Controllers\Portal\ReportsController::class, 'showPractitionerReport'])->name('practitioner-report');
     Route::get('/filter-practitioner-report', [App\Http\Controllers\Portal\ReportsController::class, 'filterPractitionerReport'])->name('filter-practitioner-report');
     Route::get('/clients', [App\Http\Controllers\Portal\ReportsController::class, 'showClientReport'])->name('client-report');
+    Route::get('/followup-dashboard-chart', [App\Http\Controllers\Portal\SalesnMarketingController::class, 'showFollowupDashboardStatistics'])->name('followup-dashboard-chart');
 
 });
 

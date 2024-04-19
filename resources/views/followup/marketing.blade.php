@@ -40,7 +40,7 @@
                        @include('followup.partial._top-navigation')
                             <div class="row mt-5">
                                 <div class="col-md-12 col-xxl-12 col-sm-12">
-                                    <p>Currently showing performance report for @if($search == 0)<code>{{date('Y')}}</code> @else
+                                    <p>Currently showing performance report of @if($search == 0)<code>3 months ago.</code> Between <code>{{ date('d M, Y', strtotime("-90 days")) }}</code> to <code>{{ date('d M, Y', strtotime(now())) }}</code> @else
                                             <span><strong class="text-success">From:</strong> {{date('d M, Y', strtotime($from))}}</span>
                                             <span><strong class="text-danger">To:</strong> {{date('d M, Y', strtotime($to))}}</span>
                                         @endif</p>
@@ -80,7 +80,9 @@
                                     <div class="card">
                                         <div class="card-header bg-primary text-white">Performance Chart</div>
                                         <div class="card-body">
-                                            <div id="stacked-column-chart" class="apex-charts" dir="ltr"></div>
+                                            <p><strong>Note:</strong> Below you'll find a comparison chart. Indicating the total number of attendance, quantity of SMS that was sent, the number of people that were followed up and an insight into new members/first timers.</p>
+                                            <div id="attendanceMedication" class="apex-charts" dir="ltr"></div>
+                                            <div id="stacked-column-char" class="apex-charts" dir="ltr"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -104,13 +106,30 @@
     <!-- Datatable init js -->
     <script src="/assets/js/pages/datatables.init.js"></script>
     <script src="/assets/libs/apexcharts/apexcharts.min.js"></script>
+
+    <script src="/vectormap/jquery-jvectormap-2.0.2.min.js"></script>
+    <script src="/vectormap/jquery-jvectormap-world-mill-en.js"></script>
+    <script src="/vectormap/jquery-jvectormap-in-mill.js"></script>
+    <script src="/vectormap/jquery-jvectormap-us-aea-en.js"></script>
+    <script src="/vectormap/jquery-jvectormap-uk-mill-en.js"></script>
+    <script src="/vectormap/jquery-jvectormap-au-mill.js"></script>
+
     <script src="/assets/js/axios.min.js"></script>
+    <script src="/js/chart.js"></script>
     <script>
         const incomeData = [0,0,0,0,0,0,0,0,0,0,0,0];
         const expenseData = [0,0,0,0,0,0,0,0,0,0,0,0];
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        const smsData = [0,0,0,0,0,0,0,0,0,0,0,0];
+        const leadsData = [0,0,0,0,0,0,0,0,0,0,0,0];
+        const followupData = [0,0,0,0,0,0,0,0,0,0,0,0];
+        const attendanceData = [0,0,0,0,0,0,0,0,0,0,0,0];
+        //const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
         const search = "{{$search}}";
         const url = parseInt(search) === 0 ? "{{route('revenue-statistics') }}" : "{{route('revenue-statistics-range')}}";
+        const url2 = "{{route('followup-dashboard-chart') }}";
         $(document).ready(function(){
             $('.dateInputs').hide();
             $('#filterType').on('change', function(e){
@@ -184,11 +203,191 @@
                     chart.render();
 
                 });
+
+
+            /** Comparison chart[SMS, Attendance, Leads, Followup] **/
+            axios.get(url2)
+                .then(res=> {
+                    const attendance = res.data.attendance;
+                    const leads = res.data.leads;
+                    const followup = res.data.followup;
+                    //Men
+                    attendance.map((m) => {
+                        switch (m.month) {
+                            case 1:
+                                plotAttendanceMedicationGraph(1, 1, m.total);
+                                break;
+                            case 2:
+                                plotAttendanceMedicationGraph(2, 1, m.total);
+                                break;
+                            case 3:
+                                plotAttendanceMedicationGraph(3, 1, m.total);
+                                break;
+                            case 4:
+                                plotAttendanceMedicationGraph(4, 1, m.total);
+                                break;
+                            case 5:
+                                plotAttendanceMedicationGraph(5, 1, m.total);
+                                break;
+                            case 6:
+                                plotAttendanceMedicationGraph(6, 1, m.total);
+                                break;
+                            case 7:
+                                plotAttendanceMedicationGraph(7, 1, m.total);
+                                break;
+                            case 8:
+                                plotAttendanceMedicationGraph(8, 1, m.total);
+                                break;
+                            case 9:
+                                plotAttendanceMedicationGraph(9, 1, m.total);
+                                break;
+                            case 10:
+                                plotAttendanceMedicationGraph(10, 1, m.total);
+                                break;
+                            case 11:
+                                plotAttendanceMedicationGraph(11, 1, m.total);
+                                break;
+                            case 12:
+                                plotAttendanceMedicationGraph(12, 1, m.total);
+                                break;
+                        }
+
+                    });
+                    //Women
+                    leads.map((w) => {
+                        switch (w.month) {
+                            case 1:
+                                plotAttendanceMedicationGraph(1, 2, w.total);
+                                break;
+                            case 2:
+                                plotAttendanceMedicationGraph(2, 2, w.total);
+                                break;
+                            case 3:
+                                plotAttendanceMedicationGraph(3, 2, w.total);
+                                break;
+                            case 4:
+                                plotAttendanceMedicationGraph(4, 2, w.total);
+                                break;
+                            case 5:
+                                plotAttendanceMedicationGraph(5, 2, w.total);
+                                break;
+                            case 6:
+                                plotAttendanceMedicationGraph(6, 2, w.total);
+                                break;
+                            case 7:
+                                plotAttendanceMedicationGraph(7, 2, w.total);
+                                break;
+                            case 8:
+                                plotAttendanceMedicationGraph(8, 2, w.total);
+                                break;
+                            case 9:
+                                plotAttendanceMedicationGraph(9, 2, w.total);
+                                break;
+                            case 10:
+                                plotAttendanceMedicationGraph(10, 2, w.total);
+                                break;
+                            case 11:
+                                plotAttendanceMedicationGraph(11, 2, w.total);
+                                break;
+                            case 12:
+                                plotAttendanceMedicationGraph(12, 2, w.total);
+                                break;
+                        }
+
+                    });
+                    //Children
+                    followup.map((c) => {
+                        switch (c.month) {
+                            case 1:
+                                plotAttendanceMedicationGraph(1, 3, c.total);
+                                break;
+                            case 2:
+                                plotAttendanceMedicationGraph(2, 3, c.total);
+                                break;
+                            case 3:
+                                plotAttendanceMedicationGraph(3, 3, c.total);
+                                break;
+                            case 4:
+                                plotAttendanceMedicationGraph(4, 3, c.total);
+                                break;
+                            case 5:
+                                plotAttendanceMedicationGraph(5, 3, c.total);
+                                break;
+                            case 6:
+                                plotAttendanceMedicationGraph(6, 3, c.total);
+                                break;
+                            case 7:
+                                plotAttendanceMedicationGraph(7, 3, c.total);
+                                break;
+                            case 8:
+                                plotAttendanceMedicationGraph(8, 3, c.total);
+                                break;
+                            case 9:
+                                plotAttendanceMedicationGraph(9, 3, c.total);
+                                break;
+                            case 10:
+                                plotAttendanceMedicationGraph(10, 3, c.total);
+                                break;
+                            case 11:
+                                plotAttendanceMedicationGraph(11, 3, c.total);
+                                break;
+                            case 12:
+                                plotAttendanceMedicationGraph(12, 3, c.total);
+                                break;
+                        }
+
+                    });
+                    //then
+                    const options2 = {
+                            chart: { height: 360, type: "bar", toolbar: { show: !1 }, zoom: { enabled: !0 } },
+                            plotOptions: { bar: { horizontal: false, columnWidth: "55%", endingShape: "rounded" } },
+                            dataLabels: { enabled: !1 },
+                            stroke: {
+                                show: true,
+                                width: 2,
+                                colors: ['transparent']
+                            },
+                            series: [
+                                { name: "Attendance", data: attendanceData },
+                                { name: "Leads", data: leadsData },
+                                { name: "Follow-up", data: followupData },
+                            ],
+                            xaxis: { categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] },
+                            yaxis: {
+                                title: {
+                                    text: 'Performance'
+                                }
+                            },
+                            tooltip: {
+                                y: {
+                                    formatter: function (val) {
+                                        return val.toLocaleString()
+                                    }
+                                }
+                            },
+                            colors: ["#0071C1", "#FE3A6B", '#EBBC1A'],
+                            legend: { position: "bottom" },
+                            fill: { opacity: 1 },
+                        },
+                        chart = new ApexCharts(document.querySelector("#attendanceMedication"), options2);
+                    chart.render();
+
+                });
         });
 
         function plotGraph(index,type, value){
             if(parseInt(type) === 1){
                 incomeData[index-1] = value;
+            }
+        }
+
+        function plotAttendanceMedicationGraph(index,type, value){
+            if(parseInt(type) === 1){
+                attendanceData[index-1] = value;
+            }else if(parseInt(type) === 2){
+                leadsData[index-1] = value;
+            }else{
+                followupData[index-1] = value;
             }
         }
     </script>

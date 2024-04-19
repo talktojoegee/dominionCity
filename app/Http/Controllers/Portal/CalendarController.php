@@ -255,9 +255,15 @@ class CalendarController extends Controller
         $this->validate($request,[
             'programName'=>'required',
             'programDate'=>'required',
+            'men'=>'required',
+            'women'=>'required',
+            'children'=>'required',
         ],[
             'programName.required'=>"Enter program name",
             'programDate.required'=>"Enter program date",
+            'men.required'=>"This field is required. Enter 0 if there is nobody",
+            'women.required'=>"This field is required. Enter 0 if there is nobody",
+            'children.required'=>"This field is required. Enter 0 if there is nobody",
         ]);
 
         $this->attendance->registerAttendance($request);
@@ -268,12 +274,17 @@ class CalendarController extends Controller
         $this->validate($request,[
             'programName'=>'required',
             'programDate'=>'required',
-            'attendanceId'=>'required'
+            'attendanceId'=>'required',
+            'men'=>'required',
+            'women'=>'required',
+            'children'=>'required',
         ],[
-            'programName.required'=>"Enter program name",
-            'programDate.required'=>"Enter program date",
-            'attendanceId.required'=>''
-        ]);
+           'programName.required'=>"Enter program name",
+           'programDate.required'=>"Enter program date",
+           'men.required'=>"This field is required. Enter 0 if there is nobody",
+           'women.required'=>"This field is required. Enter 0 if there is nobody",
+           'children.required'=>"This field is required. Enter 0 if there is nobody",
+       ]);
 
         $this->attendance->editAttendance($request);
         session()->flash("success", "Success! Your changes were saved.");

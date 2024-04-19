@@ -157,7 +157,7 @@ class WorkflowController extends Controller
                 $this->cashbook->addCashBook($workflow->p_branch_id, $workflow->p_category_id, $cashbookAccount->cba_id,
                     $workflow->p_currency, 1, 0, 2, now(),
                     $note, $note,
-                    $workflow->p_amount,  0, substr(sha1(time()),31,40));
+                    $workflow->p_amount,  0, substr(sha1(time()),31,40), date('m'), date('Y'));
             }
         }else{
             AuthorizingPerson::publishAuthorizingPerson($postId, $request->nextAuth);

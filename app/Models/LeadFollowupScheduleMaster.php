@@ -45,5 +45,9 @@ class LeadFollowupScheduleMaster extends Model
         return LeadFollowupScheduleMaster::find($id);
     }
 
+    public function getLeadFollowupMasterIdsByDateRange($startDate, $endDate){
+        return LeadFollowupScheduleMaster::whereBetween('entry_date', [$startDate, $endDate])->pluck('id')->toArray();
+    }
+
 
 }

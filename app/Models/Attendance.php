@@ -31,7 +31,7 @@ class Attendance extends Model
         $attendance->a_no_men = $request->men ?? null;
         $attendance->a_no_women = $request->women ?? null;
         $attendance->a_no_children = $request->children ?? null;
-        $attendance->a_total = ($request->men ?? 0 + $request->women ?? 0 + $request->children ?? 0);
+        $attendance->a_total = ($request->men + $request->women + $request->children);
         $attendance->a_narration = $request->narration ?? null;
         $attendance->save();
         return $attendance;
@@ -48,7 +48,7 @@ class Attendance extends Model
         $attendance->a_no_men = $request->men ?? null;
         $attendance->a_no_women = $request->women ?? null;
         $attendance->a_no_children = $request->children ?? null;
-        $attendance->a_total = ($request->men ?? 0 + $request->women ?? 0 + $request->children ?? 0);
+        $attendance->a_total = ($request->men + $request->women + $request->children );
         $attendance->a_narration = $request->narration ?? null;
         $attendance->save();
         return $attendance;
@@ -62,6 +62,19 @@ class Attendance extends Model
             'a_program_date',
         )->whereYear('a_program_date', date('Y'))
             ->where('a_branch_id', Auth::user()->branch)
+            ->orderBy('month', 'ASC')
+            ->groupby('year','month')
+            ->get();
+    }
+
+    public function getTotalAttendanceByDateRange($startDate, $endDate){
+        return Attendance::select(
+            DB::raw("DATE_FORMAT(a_program_date, '%m-%Y') monthYear"),
+            DB::raw("YEAR(a_program_date) year, MONTH(a_program_date) month"),
+            DB::raw("SUM(a_total) total"),
+            'a_program_date',
+        )->whereBetween('a_program_date', [$startDate, $endDate])
+            //->where('a_branch_id', Auth::user()->branch)
             ->orderBy('month', 'ASC')
             ->groupby('year','month')
             ->get();

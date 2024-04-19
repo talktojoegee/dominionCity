@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class LeadFollowupScheduleDetail extends Model
 {
@@ -19,6 +20,19 @@ class LeadFollowupScheduleDetail extends Model
         $detail->master_id = $masterId;
         $detail->lead_id = $leadId;
         $detail->save();
+    }
+
+
+    public function getTotalLeadFollowupDetailsByIds($ids){
+        return LeadFollowupScheduleDetail::select(
+            DB::raw("DATE_FORMAT(created_at, '%m-%Y') monthYear"),
+            DB::raw("YEAR(created_at) year, MONTH(created_at) month"),
+            DB::raw("COUNT(id) total"),
+            'created_at',
+        )->whereIn('master_id', $ids)
+            ->orderBy('month', 'ASC')
+            ->groupby('year','month')
+            ->get();
     }
 
 
