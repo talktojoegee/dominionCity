@@ -238,8 +238,9 @@ class UserController extends Controller
         ]);
         $user = $this->user->getUserById($request->userId);
         if(!empty($user)){
-            $this->user->archiveUser($request->userId, $request->status);
-            session()->flash("success", "Account deactivated!");
+            #$this->user->archiveUser($request->userId, $request->status);
+            #session()->flash("success", "Account deactivated!");
+            session()->flash("success", "This function is disabled for a testing purpose.");
             return back();
         }else{
             return back();
