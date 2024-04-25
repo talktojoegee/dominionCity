@@ -50,7 +50,7 @@ class SendSMSCommand extends Command
                          echo "\n Current Time:". $currentTime." | \t Message Time: ".$messageTime." | \t Date:".$currentDate->format('d M, Y')." | \t Status: ".($currentTime === $messageTime ? 'Same' : 'Not same');
                          if($currentTime === $messageTime){
                              $this->sendSmartSms($message->sender_id, $message->sent_to, $message->message, 1, $message->batch_code);
-                             if($message->recurring == 0){
+                             if($message->recurring == 2){ //scheduled for a specific time
                                  $message->recurring_active = 0;
                                  $message->save();
                              }else{

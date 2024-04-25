@@ -365,7 +365,7 @@ class SMSController extends Controller
                 }else{
                     $startDate = new \DateTime($request->dateTime);
                     $this->bulkmessage->setNewMessage($request->message, $request->phone_numbers, $senderId, 0,
-                        $startDate, $startDate, null, 0, $request->phoneGroup);
+                        $startDate, $startDate, null, 2, $request->phoneGroup);
                     session()->flash("success", "Action successful!");
                     return back();
                 }
