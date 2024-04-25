@@ -157,11 +157,15 @@ class CalendarController extends Controller
 
    public function showAppointments(){
         return view('calendar.appointments',[
-        'appointments'=>$this->calendar->getUserAppointments(Auth::user()->id, Auth::user()->org_id),
-        'yesterdays'=>$this->calendar->getUserYesterdaysAppointments(Auth::user()->id, Auth::user()->org_id),
-        'todays'=>$this->calendar->getUserTodaysAppointments(Auth::user()->id, Auth::user()->org_id),
-        'thisWeek'=>$this->calendar->getUserThisWeekAppointments(Auth::user()->id, Auth::user()->org_id),
-        'clients'=>$this->client->getAllMyClients(Auth::user()->id, Auth::user()->org_id),
+        'appointments'=>$this->calendar->getUserAppointments(),
+        //'appointments'=>$this->calendar->getUserAppointments(Auth::user()->id, Auth::user()->org_id),
+        //'yesterdays'=>$this->calendar->getUserYesterdaysAppointments(Auth::user()->id, Auth::user()->org_id),
+            //'todays'=>$this->calendar->getUserTodaysAppointments(Auth::user()->id, Auth::user()->org_id),
+            //'thisWeek'=>$this->calendar->getUserThisWeekAppointments(Auth::user()->id, Auth::user()->org_id),
+            'clients'=>$this->client->getAllMyClients(Auth::user()->id, Auth::user()->org_id),
+            'yesterdays'=>$this->calendar->getUserYesterdaysAppointments(),
+            'todays'=>$this->calendar->getUserTodaysAppointments(),
+            'thisWeek'=>$this->calendar->getUserThisWeekAppointments(),
         'appointmentTypes'=>$this->appointmenttype->getAppointmentTypes()
         ]);
    }

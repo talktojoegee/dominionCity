@@ -79,7 +79,7 @@
                                         @foreach($leads as $lead)
                                             <tr>
                                                 <td>{{$index++}}</td>
-                                                <td>{{date('M d, Y', strtotime($lead->entry_date))}} <u class="text-info">{{date('h:ia', strtotime($lead->entry_date))}}</u></td>
+                                                <td>{{date('M d, Y', strtotime($lead->entry_date))}}</td>
                                                 <td>{{$lead->first_name ?? '' }} {{$lead->last_name ?? '' }}
                                                     <sup class="badge rounded-pill bg-success">{{$lead->getStatus->status ?? '' }}</sup>
                                                 </td>

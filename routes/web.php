@@ -214,6 +214,7 @@ Route::group(['prefix'=>'newsfeed', 'middleware'=>'auth'], function(){
    Route::get('/birthdays', [App\Http\Controllers\Portal\TimelineController::class, 'showBirthdays'])->name('birthdays');
    Route::post('/publish-timeline-post', [App\Http\Controllers\Portal\TimelineController::class, 'storeTimelinePost'])->name('publish-timeline-post');
    Route::get('/post/{slug}', [App\Http\Controllers\Portal\TimelineController::class, 'readTimelinePost'])->name('read-timeline-post');
+   Route::post('post-comment', [App\Http\Controllers\Portal\TimelineController::class, 'postComment'])->name('post-comment');
 });
 
 Route::group(['prefix'=>'/bulk-sms', 'middleware'=>'auth'],function(){

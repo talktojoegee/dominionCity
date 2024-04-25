@@ -202,7 +202,7 @@ class ReportsController extends Controller
         switch($request->feature){
             case 1:
                 $this->validateFilterTypeRequest($request);
-                $appointments = $request->filterType == 1 ? $this->appointment->getAllPractitionerAppointments($orgId, $practitionerId) : $this->appointment->getAllPractitionerAppointmentsByDateRange($orgId, $practitionerId, $from, $to) ;
+                $appointments = $request->filterType == 1 ? $this->appointment->getAllPractitionerAppointments($orgId, $practitionerId) : $this->appointment->getAllPractitionerAppointmentsByDateRange($practitionerId, $from, $to) ;
                 return view('reports.practitioner', [
                     'appointments'=>$appointments,
                     'filterType'=>$request->filterType,

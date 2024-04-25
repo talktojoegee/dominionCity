@@ -2,8 +2,13 @@
 namespace App\Http\Traits;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
+use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Markdown;
+use Illuminate\View\View;
 
-trait UtilityTrait{
+trait UtilityTrait {
 
     public function getIntegerArray($arr){
         $values = [];
@@ -89,6 +94,23 @@ trait UtilityTrait{
     public function redirectError(){
         session()->flash("error", "Whoops! Something went wrong.");
         return back();
+    }
+
+    public function uploadFile(Request $request)
+    {
+        if ($request->hasFile('attachment')) {
+            $extension = $request->attachment->getClientOriginalExtension();
+            $filename = uniqid() . '_' . time() . '_' . date('Ymd') . '.' . $extension;
+            $dir = 'assets/drive/cloud/';
+            $request->attachment->move(public_path($dir), $filename);
+           return $filename;
+        }
+
+    }
+
+
+    public function sendEmail(View $view = null, Model $model = null, Markdown $markdown = null){
+
     }
 }
 ?>

@@ -91,7 +91,7 @@
             <div class="col-xl-12 col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#client" class="btn btn-primary  mb-3">Add New Event <i class="bx bxs-timer"></i> </a>
+                        <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#calendar" class="btn btn-primary  mb-3">Add New Event <i class="bx bxs-timer"></i> </a>
                     </div>
                     <div class="card-body">
 
@@ -277,6 +277,62 @@
                         </div>
                     </form>
 
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal right fade" id="calendar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" >
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header" >
+                    <h6 class="modal-title text-uppercase" id="myModalLabel2">Add To Calendar</h6>
+                    <button type="button" style="margin: 0px; padding: 0px;" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-body">
+                            <!-- Nav tabs -->
+                            <ul class="nav nav-tabs nav-tabs-custom nav-justified" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#messages1" role="tab">
+                                        <span class="d-block d-sm-none"><i class="far fa-envelope"></i></span>
+                                        <span class="d-none d-sm-block">New Event</span>
+                                    </a>
+                                </li>
+                            </ul>
+                            <div class="tab-content p-3 text-muted">
+
+                                <div class="tab-pane active" id="messages1" role="tabpanel">
+                                    <form action="{{route('add-calendar-block-event')}}" data-parsley-validate="" method="post" id="blockSessionForm">
+                                        @csrf
+                                        <div class="form-group">
+                                            <label for="">Title</label>
+                                            <input type="text" data-parsley-required-message="Enter a title for this block session" required name="note" placeholder="Title" class="form-control">
+                                            @error('note') <i class="text-danger">{{$message}}</i>@enderror
+                                        </div>
+                                        <div class="form-group mt-2">
+                                            <label for="">Start Date & Time</label>
+                                            <input type="datetime-local"  data-parsley-required-message="When is this event scheduled to start?" required name="when" placeholder="Start Date & Time" class="form-control when">
+                                            @error('when') <i class="text-danger">{{$message}}</i>@enderror
+                                        </div>
+                                        <div class="form-group mt-2">
+                                            <label for="">End Date & Time</label>
+                                            <input type="datetime-local" id="endDate" data-parsley-required-message="When is this event scheduled to end?" required name="endDate" placeholder="End Date & Time" class="form-control end">
+                                            @error('endDate') <i class="text-danger">{{$message}}</i>@enderror
+                                            <input type="hidden" name="sessionType" value="3">
+                                        </div>
+                                        <div class="form-group d-flex justify-content-center mt-3">
+                                            <div class="btn-group">
+                                                <button type="submit" class="btn btn-primary  waves-effect waves-light">Add Event <i class="bx bx-right-arrow"></i> </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -22,6 +22,9 @@ class Post extends Model
     public function getAuthorizingPersons(){
         return $this->hasMany(AuthorizingPerson::class, 'ap_post_id');
     }
+    public function getPostViews(){
+        return $this->hasMany(PostView::class, 'pv_post_id');
+    }
 
     public function getPostComments(){
         return $this->hasMany(PostComment::class, 'pc_post_id')->orderBy('pc_id', 'DESC');
@@ -89,7 +92,7 @@ class Post extends Model
 
 
     public function getPostsByIds($postIds){
-        return Post::whereIn('p_id', $postIds)->orderBy('p_id', 'DESC')->get();
+        return Post::whereIn('p_id', $postIds)->orderBy('p_id', 'DESC')->paginate(10);
     }
 
     public function getCorrespondenceByPostId($postId){

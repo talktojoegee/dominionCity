@@ -195,7 +195,7 @@
                                                          alt="{{$post->getAuthor->first_name ?? '' }}"  class="avatar-sm" >
                                                     <div class="ms-2">
                                                         <a href="{{ route('read-timeline-post', $post->p_slug) }}">{{$post->p_title ?? '' }}</a>
-                                                        <p class="tx-11 text-muted">{{$post->getAuthor->title ?? '' }} {{$post->getAuthor->first_name ?? '' }} {{$post->getAuthor->last_name ?? '' }}</p>
+                                                        <p class="tx-11 text-muted">{{$post->getAuthor->title ?? '' }} {{$post->getAuthor->first_name ?? '' }} {{$post->getAuthor->last_name ?? '' }} | <span><small>{{ date('d M, Y h:ia', strtotime($post->created_at)) }}</small></span></p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -203,8 +203,29 @@
                                         <div class="card-body">
                                             {!! strlen(strip_tags($post->p_content)) > 150 ? substr(strip_tags($post->p_content), 0,150).'...<a href='.$post->p_slug.'>Read more</a>' : strip_tags($post->p_content) !!}
                                         </div>
+                                        <div class="card-footer">
+                                            <div class="d-flex post-actions">
+                                                <a href="javascript:;" class="d-flex align-items-center text-muted me-4">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                                    <span class="d-none d-md-block ms-2"> {{ number_format($post->getPostViews->count()) }} View{{$post->getPostViews->count() > 1 ? 's' : null}}</span>
+                                                </a>
+                                                <a href="javascript:;" class="d-flex align-items-center text-muted me-4">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                         class="feather feather-message-square icon-md">
+                                                        <path
+                                                            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                                    </svg>
+                                                    <span class="d-none d-md-block ms-2">{{ number_format($post->getPostComments->count()) }} Comment{{$post->getPostComments->count() > 1 ? 's' : null}}</span>
+                                                </a>
+                                            </div>
+                                        </div>
                                     </div>
                                 @endforeach
+                            </div>
+                            <div class="col-md-12 d-flex justify-content-center">
+                                {{$posts->links()}}
                             </div>
                         </div>
                         <div class="tab-pane" id="settings1" role="tabpanel" >
@@ -398,7 +419,7 @@
 
                         </div>
                         <div class="tab-pane" id="log" role="tabpanel" >
-                            <p>Here's a record of <code>{{$user->title ?? '' }} {{$user->first_name ?? '' }} {{$user->last_name ?? '' }} {{$user->other_names ?? '' }}'s</code> activities across board.</p>
+                            <p>Here's a record of @if(Auth::user()->id != $user->id )  <code>{{$user->title ?? '' }} {{$user->first_name ?? '' }} {{$user->last_name ?? '' }} {{$user->other_names ?? '' }}'s</code> @else <code>your</code> @endif activities across board.</p>
                             <div class="mt-4" style="height: 660px; overflow-y: scroll;">
                                 <ul class="verti-timeline list-unstyled">
                                     @foreach($user->getUserActivityLogs as $log)
