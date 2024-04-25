@@ -81,7 +81,9 @@ class User extends Authenticatable
     }
 
     public function getUserNotifications(){
-        return $this->hasMany(Notification::class, 'user_id')->whereNull('read_at')->orderBy('id', 'DESC');
+        return $this->hasMany(Notification::class, 'user_id')
+            ->where('is_read',0)
+            ->orderBy('id', 'DESC');
     }
 
     public function getUserOrganization(){

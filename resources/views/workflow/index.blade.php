@@ -25,6 +25,84 @@
 @section('main-content')
     <div class="container-fluid">
         <div class="row">
+            <div class="row">
+
+                <div class="col-xl-3 col-sm-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row mb-1">
+                                <div class="col">
+                                    <p class="mb-1">Total</p>
+                                    <h5 class="mb-0 number-font">{{env('APP_CURRENCY')}}{{ number_format($workflows->where('p_type',6)->sum('p_amount')) }}</h5>
+                                </div>
+                                <div class="col-auto mb-0">
+                                    <div class="dash-icon text-secondary1">
+                                        <i class="bx bxs-briefcase-alt-2"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="fs-12 text-muted"> <span class="text-muted fs-12 ml-0 mt-1">My Requests<code>({{ number_format($workflows->where('p_type',6)->count()) }})</code></span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-sm-6" >
+                    <div class="card" >
+                        <div class="card-body" >
+                            <div class="row mb-1" >
+                                <div class="col" >
+                                    <p class="mb-1">Declined</p>
+                                    <h5 class="mb-0 number-font">{{env('APP_CURRENCY')}}{{number_format( $workflows->where('p_status',3)->where('p_type',6)->sum('p_amount') )}}</h5>
+                                </div>
+                                <div class="col-auto mb-0" >
+                                    <div class="dash-icon text-orange" >
+                                        <i class="bx bxs-book-open"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="fs-12 text-muted"> <span class="text-muted fs-12 ml-0 mt-1">Total Declined<code>({{number_format($workflows->where('p_status',3)->where('p_type',6)->count())}})</code></span></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-sm-6" >
+                    <div class="card" >
+                        <div class="card-body" >
+                            <div class="row mb-1" >
+                                <div class="col" >
+                                    <p class="mb-1">Approved</p>
+                                    <h5 class="mb-0 number-font">{{env('APP_CURRENCY')}}{{number_format( $workflows->where('p_status',2)->where('p_type',6)->sum('p_amount') )}}</h5>
+                                </div>
+                                <div class="col-auto mb-0" >
+                                    <div class="dash-icon text-secondary" >
+                                        <i class="bx bx-check-double"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="fs-12 text-muted">  <span class="text-muted fs-12 ml-0 mt-1">Total Approved<code>({{number_format( $workflows->where('p_status',2)->where('p_type',6)->count() )}})</code></span></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-sm-6" >
+                    <div class="card" >
+                        <div class="card-body" >
+                            <div class="row mb-1" >
+                                <div class="col" >
+                                    <p class="mb-1">Pending</p>
+                                    <h3 class="mb-0 number-font">{{env('APP_CURRENCY')}}{{number_format( $workflows->where('p_status',0)->where('p_type',6)->sum('p_amount') )}}</h3>
+                                </div>
+                                <div class="col-auto mb-0" >
+                                    <div class="dash-icon text-warning" >
+                                        <i class="bx bx-hourglass"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="fs-12 text-muted">  <span class="text-muted fs-12 ml-0 mt-1">Total Pending<code>({{number_format( $workflows->where('p_status',0)->where('p_type',6)->count() )}})</code> </span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
             <div class="col-xl-12 col-md-12">
                 <div class="card">
                     <div class="card-header">
@@ -48,6 +126,8 @@
                             </div>
                         @endif
 
+
+
                             <div class="table-responsive mt-3">
                                 <table id="datatable1" class="table table-striped table-bordered nowrap dataTable" role="grid" aria-describedby="complex-header_info" style="width: 100%; margin:0px auto;">
                                     <thead style="position: sticky;top: 0">
@@ -70,13 +150,16 @@
                                             <td class="">{{$a++}}</td>
                                             <td class="sorting_1 text-left">{{ date('d M, Y', strtotime($flow->created_at)) }}</td>
                                             <td class="">{{$flow->p_title ?? ''}}</td>
-                                            <td class="" style="text-align: right">{{$flow->getCurrency->code ?? ''}} {{$flow->getCurrency->symbol ?? '' }}{{ number_format($flow->p_amount ?? 0, 2) }}</td>
+                                            <td class="" style="text-align: right">{{$flow->getCurrency->symbol ?? '' }}{{ number_format($flow->p_amount ?? 0, 2) }}</td>
                                             <td class="">
                                                 @switch($flow->p_status)
                                                     @case(0)
                                                         <span class="text-info">Pending</span>
                                                     @break
                                                     @case(1)
+                                                    <span class="text-info">Processing</span>
+                                                    @break
+                                                    @case(2)
                                                         <span class="text-success">Approved</span>
                                                     @break
                                                     @case(3)

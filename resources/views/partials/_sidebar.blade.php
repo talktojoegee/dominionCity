@@ -78,6 +78,7 @@
         <li>
             <a href="{{route('pastors')}}" class="waves-effect">
                 <i class="bx bxs-user-badge"></i>
+                <span class="badge rounded-pill bg-danger float-end" >10</span>
                 <span key="t-chat">Users</span>
             </a>
         </li>

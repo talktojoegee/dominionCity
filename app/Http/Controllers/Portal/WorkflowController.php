@@ -151,7 +151,7 @@ class WorkflowController extends Controller
             Post::updatePostStatus($postId, $status);
             #Push to cashbook
             $workflow = $this->post->getPostById($postId);
-            if(!empty($workflow)){
+            if(!empty($workflow) && ($workflow->p_type == 6)){
                 $note = $workflow->p_title.' '.$workflow->p_content;
                 $cashbookAccount = $this->cashbookaccount->getBranchFirstAccount($workflow->p_branch_id);
                 $this->cashbook->addCashBook($workflow->p_branch_id, $workflow->p_category_id, $cashbookAccount->cba_id,

@@ -46,6 +46,8 @@ class Lead extends Model
         $lead->city = $request->city ?? null;
         $lead->state = $request->state ?? null;
         $lead->code = $request->code ?? null;
+        $lead->entry_month = date('m',strtotime($request->date));
+        $lead->entry_year = date('Y',strtotime($request->date));
         $lead->slug = Str::slug($request->firstName).'-'.Str::random(8);
         $lead->save();
         return $lead;

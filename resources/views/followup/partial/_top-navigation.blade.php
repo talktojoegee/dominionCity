@@ -11,12 +11,12 @@
             <span class="d-none d-sm-block">Leads</span>
         </a>
     </li>
-    <li class="nav-item">
-        <a class="nav-link {{request()->routeIs('marketing-messaging') ? 'active' : '' }}" href="{{route('marketing-messaging')}}" role="tab">
+    <!-- <li class="nav-item">
+        <a class="nav-link {request()->routeIs('marketing-messaging') ? 'active' : '' }}" href="{route('marketing-messaging')}}" role="tab">
             <span class="d-block d-sm-none"><i class="far fa-envelope"></i></span>
             <span class="d-none d-sm-block">Messaging</span>
         </a>
-    </li>
+    </li> -->
    <!-- <li class="nav-item">
         <a class="nav-link request()->routeIs('marketing-automations') ? 'active' : '' }}" href="route('marketing-automations')}}" role="tab">
             <span class="d-block d-sm-none"><i class="far fa-envelope"></i></span>

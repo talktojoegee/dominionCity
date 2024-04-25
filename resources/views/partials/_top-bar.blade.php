@@ -57,7 +57,7 @@
                 <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-notifications-dropdown"
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="bx bx-bell bx-tada"></i>
-                    <span class="badge bg-danger rounded-pill">{{Auth::user()->getUserNotifications->count() > 99 ? '99+' : Auth::user()->getUserNotifications->count()}}</span>
+                    <span class="badge bg-danger rounded-pill" style="background: #ff0000 !important;">{{Auth::user()->getUserNotifications->count() > 99 ? '99+' : Auth::user()->getUserNotifications->count() }}</span>
                 </button>
                 <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
                      aria-labelledby="page-header-notifications-dropdown">
