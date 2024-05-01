@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\NewUserMail;
 use App\Models\ActivityLog;
 use App\Models\ChurchBranch;
 use App\Models\Country;
+use App\Models\EmailQueue;
 use App\Models\MaritalStatus;
 use App\Models\ModuleManager;
 use App\Models\Post;
 use App\Models\PostCorrespondingPerson;
 use App\Models\Role;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role as SRole;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -149,17 +153,28 @@ class UserController extends Controller
             "role.required"=>"What role best fits this person?",
         ]);
         try {
-            $user = $this->user->createUser($request);
+            $password = Str::random(8);
+            $user = $this->user->createUser($request, $password);
             $role = $this->role->getRoleById($request->role);
             if(!empty($role)){
                 $user->assignRole($role->name);
             }
+
             if(isset($request->avatar)){
                 $this->user->uploadProfilePicture($request->avatar, $user->id);
             }
+
             $log = Auth::user()->first_name." ".Auth::user()->last_name." created $user->first_name $user->last_name 's account";
             ActivityLog::registerActivity(Auth::user()->org_id, null, Auth::user()->id, null, 'Account Creation', $log);
             $message = "You've successfully added a new  user to the system.";
+            //try {
+                Mail::to($user)->send(new NewUserMail($user, $password));
+                EmailQueue::queueEmail($user->id, 'New Account', 'Your account was successfully registered.');
+                //\Mail::to($contact)->send(new ReceiptMailer($receipt, $contact));
+           /* } catch (\Exception $exception) {
+
+            }*/
+
             session()->flash("success", $message);
             return back();
         }catch (\Exception $exception){

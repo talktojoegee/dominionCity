@@ -111,8 +111,8 @@ class User extends Authenticatable
         $user->save();
         return $user;
     }
-    public function createUser(Request $request){
-        $password = Str::random(8);
+    public function createUser(Request $request, $password){
+        //$password = Str::random(8);
         $user = new User();
         $user->title = $request->title ?? null;
         $user->first_name = $request->firstName;
