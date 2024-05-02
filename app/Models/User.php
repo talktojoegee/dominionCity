@@ -157,6 +157,10 @@ class User extends Authenticatable
         $user->pastor = isset($request->pastor) ? 1 : 0;
         $user->gender = isset($request->gender) ? 1 : 0;
         $user->country_id = $request->nationality;
+        $user->birth_date = $request->dob ?? null;
+        $user->birth_year = date('Y', strtotime($request->dob)) ?? null;
+        $user->birth_month = date('m', strtotime($request->dob)) ?? null;
+        $user->birth_day = date('d', strtotime($request->dob)) ?? null;
         $user->address_1 = $request->presentAddress;
         $user->marital_status = $request->maritalStatus;
         $user->occupation = $request->occupation;

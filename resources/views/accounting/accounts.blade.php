@@ -150,7 +150,7 @@
                         </div>
                         <div class="form-group mt-3">
                             <label for="">Currency</label>
-                            <select name="type" class="form-control" data-parsley-required-message="Assign a currency to this account" required>
+                            <select name="currency" class="form-control" data-parsley-required-message="Assign a currency to this account" required>
                                 <option selected disabled>-- Select currency --</option>
                                 @foreach($currencies as $currency)
                                  <option value="{{ $currency->id }}">{{ $currency->name ?? '' }}({{ $currency->symbol ?? '' }})</option>

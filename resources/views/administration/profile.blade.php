@@ -296,7 +296,7 @@
                                                 <div class="col-md-6 col-sm-12 col-lg-6">
                                                     <div class="form-group mt-1">
                                                         <label for=""> Date of Birth <span class="text-danger">*</span></label>
-                                                        <input type="date" disabled value="{{date('Y-m-d', strtotime($user->birth_date))}}" name="dob" required placeholder="Date of Birth" data-parsley-required-message="Enter date of birth" class="form-control">
+                                                        <input type="date"  value="{{date('Y-m-d', strtotime($user->birth_date))}}" name="dob" required placeholder="Date of Birth" data-parsley-required-message="Enter date of birth" class="form-control">
                                                         @error('dob') <i class="text-danger">{{$message}}</i>@enderror
                                                     </div>
                                                 </div>
