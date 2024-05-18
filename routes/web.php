@@ -238,9 +238,12 @@ Route::group(['prefix'=>'/bulk-sms', 'middleware'=>'auth'],function(){
 
     Route::get('/phone-groups',[App\Http\Controllers\Portal\SMSController::class, 'showPhoneGroupForm'])->name('phone-groups');
     Route::post('/phone-groups',[App\Http\Controllers\Portal\SMSController::class, 'setNewPhoneGroup']);
-    Route::post('/edit-phone-group',[App\Http\Controllers\Portal\SMSController::class, 'setNewPhoneGroup'])->name('edit-phone-group');
+    Route::post('/edit-phone-group',[App\Http\Controllers\Portal\SMSController::class, 'updatePhoneGroup'])->name('edit-phone-group');
 
     Route::get('/batch-report', [App\Http\Controllers\Portal\SMSController::class, 'batchReport'])->name('batch-report');
+
+    Route::get('/messages', [App\Http\Controllers\Portal\SMSController::class, 'showBulksmsMessages'])->name('bulksms-messages');
+    Route::post('/update-message-status', [App\Http\Controllers\Portal\SMSController::class, 'updateMessageStatus'])->name('update-message-status');
 
     //Route::post('/regenerate-api-token',[App\Http\Controllers\UserController::class, 'reGenerateApiToken'])->name('regenerate-api-token');
 });

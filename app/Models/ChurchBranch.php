@@ -21,6 +21,13 @@ class ChurchBranch extends Model
         return $this->belongsTo(State::class, 'cb_state');
     }
 
+    public function getChurchAssignmentLog(){
+        return $this->hasMany(ChurchBranchLog::class, 'cbl_branch_id');
+    }
+    public function getBranchMembers(){
+        return $this->hasMany(User::class, 'branch');
+    }
+
     public function getLeadPastor(){
         return $this->belongsTo(User::class, 'cb_head_pastor');
     }
@@ -73,7 +80,7 @@ class ChurchBranch extends Model
     }
 
     public function getChurchBranchByBranchIds($branchIds){
-        return ChurchBranch::where('cb_id', $branchIds)->get();
+        return ChurchBranch::whereIn('cb_id', $branchIds)->get();
     }
 
     public function getChurchBranchBySlug($slug){

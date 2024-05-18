@@ -89,8 +89,8 @@
                                                                     </div>
                                                                     <div class="form-group">
                                                                         <label for="">Phone Numbers</label>
-                                                                        <textarea name="contact" id="contact" cols="30" rows="10" style="resize: none" placeholder="Enter a list of phone numbers separated by comma." class="form-control">{{old('contact',$group->phone_numbers)}}</textarea>
-                                                                        @error('contact') <i class="text-danger mt-2">{{$message}}</i>@enderror
+                                                                        <textarea name="phone_numbers" id="contact" cols="30" rows="10" style="resize: none" placeholder="Enter a list of phone numbers separated by comma." class="form-control">{{old('contact',$group->phone_numbers)}}</textarea>
+                                                                        @error('phone_numbers') <i class="text-danger mt-2">{{$message}}</i>@enderror
                                                                     </div>
                                                                     <div class="form-group d-flex justify-content-center mt-2">
                                                                         <input type="hidden" name="group" value="{{$group->id}}">

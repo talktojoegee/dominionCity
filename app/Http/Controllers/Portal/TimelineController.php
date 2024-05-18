@@ -7,6 +7,7 @@ use App\Http\Traits\UtilityTrait;
 use App\Models\AuthorizingPerson;
 use App\Models\Calendar;
 use App\Models\ChurchBranch;
+use App\Models\EmailQueue;
 use App\Models\Post;
 use App\Models\PostAttachment;
 use App\Models\PostComment;
@@ -86,21 +87,28 @@ class TimelineController extends Controller
                 $userIds = User::pluck('id');
                 $values = json_encode($this->getIntegerArray($userIds));
                 PostCorrespondingPerson::storeDetails($post->p_id, 1, $values);
+                $message = "You're part of a new publication titled $request->subject. Kindly login to your account to access the details.";
+                $this->queueEmailForSending($userIds, 'New Publication', $message);
                 break;
             case 2: //For branch
                 $this->validate($request,[
                    'branches'=>'required',
                 ],['branches.required'=>"Select the church branch(es) concerned"]);
+                $userIds = User::whereIn('branch', $request->branches)->pluck('id');
                 $values = json_encode($this->getIntegerArray($request->branches));
                 PostCorrespondingPerson::storeDetails($post->p_id, 2, $values);
+                $message = "You're part of a new publication titled $request->subject. Kindly login to your account to access the details.";
+                $this->queueEmailForSending($userIds, 'New Publication', $message);
                 break;
             case 3: //For region
                 $this->validate($request,[
                     'regions'=>'required',
                 ],['regions.required'=>"Select the church regions concerned"]);
-
+                //$userIds = User::whereIn('region', $request->regions)->pluck('id');
                 $values = json_encode($this->getIntegerArray($request->regions));
                 PostCorrespondingPerson::storeDetails($post->p_id, 3, $values);
+                //$message = "You're part of a new publication titled $request->subject. Kindly login to your account to access the details.";
+                //$this->queueEmailForSending($userIds, 'New Publication', $message);
                 break;
             case 4: //For individuals
                 $this->validate($request,[
@@ -142,15 +150,15 @@ class TimelineController extends Controller
             PostView::registerPostView(Auth::user()->id, $post->p_id);
         }
         $postType = $this->getPostType($post->p_type);
-        $branches = null;
+        $branches = [];
         $regions = null;
         $users = null;
         switch($post->p_scope){
-            case 2:
+            case 2: //branch
                 $ids = $this->post->getCorrespondenceByPostId($post->p_id);
-                $branches = $this->churchbranch->getChurchBranchByBranchIds($ids->pcp_target);
+                $branches = $this->churchbranch->getChurchBranchByBranchIds(json_decode($ids->pcp_target));
                 break;
-            case 4:
+            case 4: //Individuals
                 $ids = $this->post->getCorrespondenceByPostId($post->p_id);
                 $users = $this->user->getUserByIds(json_decode($ids->pcp_target));
 
@@ -184,4 +192,6 @@ class TimelineController extends Controller
             "users"=>$this->user->getAllUsers()
         ]);
     }
+
+
 }

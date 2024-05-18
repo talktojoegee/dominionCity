@@ -73,7 +73,7 @@
                                                         @endforeach
                                                     @elseif($scope == 2)
                                                         @foreach($branches as $branch)
-                                                            {{$branch->cb_name ?? '' }}
+                                                            {{$branch->cb_name ?? '' }},
                                                         @endforeach
                                                     @elseif($scope == 1)
                                                         <span style="background: #f46a6a; padding:4px; color:#fff;">Everyone</span>

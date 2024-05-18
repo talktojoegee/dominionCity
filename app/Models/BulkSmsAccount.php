@@ -27,11 +27,19 @@ class BulkSmsAccount extends Model
     }
 
     public function debitAccount($ref, $amount, $units){
-        //$actual_amount = $amount;
-        //$units = $cost/3;
         $trans = new BulkSmsAccount();
         $trans->ref_no = $ref;
         $trans->user_id = Auth::user()->id;
+        $trans->debit = $amount;
+        $trans->no_units = $units;
+        $trans->unit_debit = $units;
+        $trans->narration = "SMS sent @ ₦".$amount;
+        $trans->save();
+    }
+    public static function staticDebitAccount($userId, $ref, $amount, $units){
+        $trans = new BulkSmsAccount();
+        $trans->ref_no = $ref;
+        $trans->user_id = $userId;
         $trans->debit = $amount;
         $trans->no_units = $units;
         $trans->unit_debit = $units;

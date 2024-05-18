@@ -39,7 +39,6 @@ class SMSController extends Controller
         $this->adminApiToken = env('SMARTSMS_API_TOKEN');
         $this->baseUrl = 'https://app.smartsmssolutions.com/';
         $this->apiToken = env('SMARTSMS_API_TOKEN');
-        //'kwhI2vfGJatjt7uMCCJC3DWfhRafi6aaYnG2Dokbby41qAOue6';
 
         //$this->middleware('auth');
         $this->bulksmsaccount = new BulkSmsAccount();
@@ -122,6 +121,29 @@ class SMSController extends Controller
             'accounts'=>$this->cashbookaccounts->getBranchAccounts($branchId),
             'categories'=>$this->transactioncategory->getBranchCategoriesByType($branchId, 2),
         ]);
+    }
+
+    public function showBulksmsMessages(){
+        return view('bulksms.messages',[
+            'messages'=>$this->bulkmessage->getAllMessages()
+        ]);
+    }
+
+    public function updateMessageStatus(Request $request){
+        $this->validate($request,[
+            'messageId'=>'required',
+            'status'=>'required'
+        ],[
+            'messageId.required'=>'',
+            'status.required'=>''
+        ]);
+        $message = $this->bulkmessage->getMessageById($request->messageId);
+        if(!empty($message)){
+            $message->recurring_active = $request->status;
+            $message->save();
+        }
+        session()->flash("success", "Action successful");
+        return back();
     }
 
     public function processTopUpRequest(Request $request){
@@ -282,7 +304,7 @@ class SMSController extends Controller
             $no_of_pages = round(strlen($request->message)/160) < 1 ? 1 : round(strlen($request->message)/160);
             try{
                 $batchMax = 500;
-                $grandTotal = $charge = $this->getBulkSMSCharge($list, $request->message, $batchMax );
+                $grandTotal =  $this->getBulkSMSCharge($list, $request->message, $batchMax );
                 return view('followup.partial._preview-message',[
                     'cost'=>$grandTotal,
                     'persons'=>$persons,
@@ -455,12 +477,12 @@ echo $test->modify('third tuesday ' . $test->format('H:i'))->format('Y-m-d H:i')
             'purpose.required'=>"Enter a brief description of what you'll be using this sender ID to do."
         ]);
         $this->senderid->createSenderId($request);
-        try{
+       /* try{
             $this->senderIdRequest($request->sender_id, $request->purpose);
             //$this->service->senderIdRequest($request->sender_id, $request->purpose);
         }catch (\Exception $ex){
 
-        }
+        }*/
         session()->flash("success", "Sender ID registered. You can use <strong>SMS Channel</strong> to send bulk SMS while you wait for your sender ID to be approved.");
         return back();
     }

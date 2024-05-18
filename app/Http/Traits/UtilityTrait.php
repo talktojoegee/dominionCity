@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Traits;
 
+use App\Models\EmailQueue;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -111,6 +112,12 @@ trait UtilityTrait {
 
     public function sendEmail(View $view = null, Model $model = null, Markdown $markdown = null){
 
+    }
+
+    public function queueEmailForSending($userIds, $subject, $message){
+        foreach($userIds as $id){
+            EmailQueue::queueEmail($id, $subject, $message);
+        }
     }
 }
 ?>

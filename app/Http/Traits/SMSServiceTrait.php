@@ -7,11 +7,10 @@ use Illuminate\Support\Facades\Auth;
 
 trait SMSServiceTrait{
 
-    public $baseUrl;
+    public $baseUrl, $adminApiToken;
     public function __construct(){
         $this->baseUrl = 'https://app.smartsmssolutions.com/';
         $this->adminApiToken = env('SMARTSMS_API_TOKEN');
-        //$this->type = 3;
     }
 
     public function checkFirstDigit($number){

@@ -186,7 +186,7 @@
                         <div class="tab-pane active" id="home1" role="tabpanel">
                             <div class="col-md-12 grid-margin mt-4">
                                 @foreach($posts as $post)
-                                    <div class="card rounded">
+                                    <div class="card rounded" style="border-top:1px dotted #293140;">
                                         <div class="card-header">
                                             <div class="d-flex align-items-center justify-content-between">
                                                 <div class="d-flex align-items-center">

@@ -17,6 +17,7 @@ class SenderId extends Model
         $sender->sender_id = $request->sender_id;
         $sender->purpose = $request->purpose;
         $sender->user_id = Auth::user()->id;
+        $sender->status = 1;
         $sender->save();
     }
     public function updateSenderId(Request $request){

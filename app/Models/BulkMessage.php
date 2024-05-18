@@ -13,6 +13,25 @@ class BulkMessage extends Model
 {
     use HasFactory;
 
+    public function getSender(){
+        return $this->belongsTo(User::class,'user_id');
+    }
+
+    public function getFrequency(){
+        return $this->belongsTo(BulkSmsFrequency::class,'bulk_frequency');
+    }
+
+    public function getPhoneGroup(){
+        return $this->belongsTo(PhoneGroup::class,'phone_group');
+    }
+
+
+    public function getUserAccount(){
+        return $this->hasMany(BulkSmsAccount::class, 'user_id')->orderBy('id', 'DESC');
+    }
+
+
+
     public function setNewMessage($msg, $phone_numbers, $senderId, $status, $startDate,
                                   $endDate, $frequency, $recurring, $phoneGroup){
         $batchCode = Str::random(11);
@@ -38,8 +57,19 @@ class BulkMessage extends Model
         return BulkMessage::where('tenant_id', Auth::user()->tenant_id)->orderBy('id', 'DESC')->get();
     }
 
+    public function getBranchMessages(){
+        return BulkMessage::where('branch_id', Auth::user()->branch)->orderBy('id', 'DESC')->get();
+    }
+    public function getAllMessages(){
+        return BulkMessage::orderBy('id', 'DESC')->get();
+    }
+
     public function getTenantMessageBySlug($slug){
         return BulkMessage::where('tenant_id', Auth::user()->tenant_id)->where('slug', $slug)->first();
+    }
+
+    public function getMessageById($id){
+        return BulkMessage::find($id);
     }
 
     public static function getRecurringMessages(){

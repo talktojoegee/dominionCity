@@ -27,7 +27,7 @@ class PhoneGroup extends Model
         $group->added_by = Auth::user()->id;
         $group->group_name = $request->group_name ?? '' ;
         $group->phone_numbers = $phone_numbers ?? '';
-        $group->slug = substr(sha1(time()),27,40);
+        //$group->slug = substr(sha1(time()),27,40);
         $group->save();
     }
 
@@ -43,5 +43,9 @@ class PhoneGroup extends Model
         $group = PhoneGroup::find($group_id);
         $counter = explode(',', $group->phone_numbers);
         return count($counter);
+    }
+
+    public static function getPhoneGroupById($id){
+        return PhoneGroup::find($id);
     }
 }

@@ -62,7 +62,8 @@ class OnlinePaymentController extends Controller
                         $this->cashbook->addCashBook($branchId, $category, $account,
                             $defaultCurrency, 2, 0, 2, now(),
                             $note, $note,
-                            ($tranx->data->amount + $tranx->data->metadata->cost)/100,  0, substr(sha1(time()),31,40));
+                            ($tranx->data->amount + $tranx->data->metadata->cost)/100,  0,
+                            substr(sha1(time()),31,40),date('m', strtotime(now())),date('Y', strtotime(now())));
                         break;
                 }
                 switch ($transaction_type){

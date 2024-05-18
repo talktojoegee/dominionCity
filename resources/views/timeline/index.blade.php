@@ -81,7 +81,7 @@
                     <div class="row">
                         @foreach($posts as $post)
                             <div class="col-md-12 grid-margin">
-                                <div class="card rounded">
+                                <div class="card rounded" style="border-top:1px dotted #293140;">
                                     <div class="modal-header" style="border-bottom: 1px solid #cccdd1 !important;">
                                         <div class="d-flex">
                                             <div class="flex-shrink-0 me-4">
