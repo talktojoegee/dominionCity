@@ -2,16 +2,17 @@
 namespace App\Http\Traits;
 
 
+use App\Models\BulkSmsAccount;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Auth;
 
 trait SMSServiceTrait{
 
-    public $baseUrl, $adminApiToken;
+  /*  public $baseUrl, $adminApiToken;
     public function __construct(){
         $this->baseUrl = 'https://app.smartsmssolutions.com/';
         $this->adminApiToken = env('SMARTSMS_API_TOKEN');
-    }
+    }*/
 
     public function checkFirstDigit($number){
         $digit = substr($number, 0,1);
@@ -48,7 +49,7 @@ trait SMSServiceTrait{
     public function getPhoneInfo($phoneNumbers, $type){
         //return $phoneNumbers;
         $client = new Client();
-        $url = $this->baseUrl."io/api/client/v1/phone/info/?token=".$this->adminApiToken."&phone=".$phoneNumbers."&type=".$type;
+        $url = env('SMARTSMS_BASEURL')."io/api/client/v1/phone/info/?token=".env('SMARTSMS_API_TOKEN')."&phone=".$phoneNumbers."&type=".$type;
         //return $url;
         $request = new \GuzzleHttp\Psr7\Request('GET', $url);
         $res = $client->sendAsync($request)->wait();
@@ -62,7 +63,7 @@ trait SMSServiceTrait{
             'multipart' => [
                 [
                     'name' => 'token',
-                    'contents' => $this->adminApiToken
+                    'contents' => env('SMARTSMS_API_TOKEN')
                 ],
                 [
                     'name' => 'sender',
@@ -101,7 +102,7 @@ trait SMSServiceTrait{
                      'contents' => $current->addMinutes(2)
                  ]*/
             ]];
-        $url = $this->baseUrl."io/api/client/v1/sms/";
+        $url = env('SMARTSMS_BASEURL')."io/api/client/v1/sms/";
         $request = new \GuzzleHttp\Psr7\Request('POST', $url);
         $res = $client->sendAsync($request, $options)->wait();
         return json_decode($res->getBody()->getContents());
@@ -117,7 +118,7 @@ trait SMSServiceTrait{
             'multipart' => [
                 [
                     'name' => 'token',
-                    'contents' => $this->adminApiToken
+                    'contents' => env('SMARTSMS_API_TOKEN')
                 ],
                 [
                     'name' => 'senderid',
@@ -140,7 +141,7 @@ trait SMSServiceTrait{
                     'contents' => 'Abuja, Nigeria'
                 ]
             ]];
-        $url = $this->baseUrl."io/api/client/v1/senderid/create/";
+        $url = env('SMARTSMS_BASEURL')."io/api/client/v1/senderid/create/";
         $request = new \GuzzleHttp\Psr7\Request('POST', $url);
         $res = $client->sendAsync($request, $options)->wait();
         return json_decode($res->getBody()->getContents());
@@ -198,6 +199,12 @@ trait SMSServiceTrait{
 
     public function getCounterBatch($filter, $maxBatch){
         return round(count($filter)/$maxBatch) <= 0 ? 1 : round(count($filter)/$maxBatch);
+    }
+
+
+    public function getWalletBalance(){
+        $wallet = BulkSmsAccount::all();
+        return $wallet->sum('credit') - $wallet->sum('debit');
     }
 
 

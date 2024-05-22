@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Http\Controllers\ServicesController;
 use App\Http\Traits\SMSServiceTrait;
 use App\Http\Traits\UtilityTrait;
 use App\Models\BulkMessage;
@@ -30,16 +31,7 @@ class SendSMSCommand extends Command
      * @var string
      */
     protected $description = 'Send bulk sms';
-    public $api;
-    public $baseUrl;
-    public $apiToken;
-    public function __construct()
-    {
-        parent::__construct();
-        $this->adminApiToken = env('SMARTSMS_API_TOKEN');
-        $this->baseUrl = 'https://app.smartsmssolutions.com/';
-        $this->apiToken = env('SMARTSMS_API_TOKEN');
-    }
+
 
 
     /**
@@ -55,6 +47,8 @@ class SendSMSCommand extends Command
         $messages = BulkMessage::getRecurringMessages();
         if(count($messages) > 0){
             foreach($messages as $message){
+               // echo "\n Base URL:: ".env('SMARTSMS_BASEURL')."\n";
+                //echo "\n API Token:: ".env('SMARTSMS_API_TOKEN')."\n";
                 $currentDate = new \DateTime(date("Y-m-d"));
                 $scheduledDate = new \DateTime(date("Y-m-d", strtotime($message->next_schedule)));
                 if($currentDate == $scheduledDate){
@@ -64,7 +58,8 @@ class SendSMSCommand extends Command
                     if($currentTime === $messageTime){
 
                         //Get church current bulk sms balance
-                        $balance = $message->getUserAccount->sum('credit') - $message->getUserAccount->sum('debit');
+                        $balance = $this->getWalletBalance();
+                        //$message->getUserAccount->sum('credit') - $message->getUserAccount->sum('debit');
                         //echo "Balance: $balance \n";
                         /**
                          * Update list of receivers
@@ -99,13 +94,14 @@ class SendSMSCommand extends Command
                             $totalCost =  $this->getBulkSMSCharge($list, $message->message, $batchMax );
 
                             //echo "\t Cost: $totalCost ";
+                            //echo "\t Balance: $balance ";
 
                             if($balance > $totalCost){
                                 $units = round($persons);
-                                $response = $this->sendSmartSms($message->sender_id, $message->sent_to, $message->message, 1, $message->batch_code);
-                                //echo "Response: ".print_r($send);
-                                //[code] => 1002
-                                //echo "\t Code: ".$response->code."\t";
+                                //echo "\n Before service call: \n";
+                                //echo "ID:: $message->sender_id To:: $message->sent_to Message:: $message->message Code:: $message->batch_code \n";
+
+                                $response = ServicesController::sendStaticSmartSms($message->sender_id, $message->sent_to, $message->message, 0, $message->batch_code);
                                 if($response->code >= 1000){
                                     /**
                                      * Charge bulk sms wallet/account

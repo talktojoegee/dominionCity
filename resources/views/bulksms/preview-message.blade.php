@@ -126,7 +126,7 @@
                                 <div class="card-footer text-right d-flex justify-content-center">
                                     <div class="btn-group">
                                         <a href="{{url()->previous()}}" class="btn btn-secondary ml-3">Cancel</a>
-                                        @if( (Auth::user()->getUserAccount->sum('credit') - Auth::user()->getUserAccount->sum('debit')) < $cost )
+                                        @if(  $balance < $cost )
                                             <a href="{{route('top-up')}}" target="_blank" class=" ml-3 btn-primary text-center">Top-up <i class="bx bxs-bank"></i> </a>
                                         @else
                                             <button type="submit" class=" ml-4 btn btn-primary ">{{$type == 1 ? 'Send Message' : 'Schedule Message'}} <i class="bx bxs-right-arrow"></i> </button>

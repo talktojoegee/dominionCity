@@ -254,6 +254,7 @@ class SMSController extends Controller
 
                 return view('bulksms.preview-message',[
                     'cost'=>$grandTotal,
+                    'balance'=>$this->getWalletBalance(),
                     'persons'=>$persons,
                     'transactions'=>$this->bulksmsaccount->getBulkSmsTransactions(),
                     'pages'=>$no_of_pages,
@@ -308,6 +309,7 @@ class SMSController extends Controller
                 $grandTotal =  $this->getBulkSMSCharge($list, $request->message, $batchMax );
                 return view('followup.partial._preview-message',[
                     'cost'=>$grandTotal,
+                    'balance'=>$this->getWalletBalance(),
                     'persons'=>$persons,
                     'transactions'=>$this->bulksmsaccount->getBulkSmsTransactions(),
                     'pages'=>$no_of_pages,

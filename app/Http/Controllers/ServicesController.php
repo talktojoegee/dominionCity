@@ -51,7 +51,7 @@ class ServicesController extends Controller
     public function getPhoneInfo($phoneNumbers, $type){
         //return $phoneNumbers;
         $client = new Client();
-        $url = $this->baseUrl."io/api/client/v1/phone/info/?token=".$this->adminApiToken."&phone=".$phoneNumbers."&type=".$type;
+        $url = env('SMARTSMS_BASEURL')."io/api/client/v1/phone/info/?token=".env('SMARTSMS_API_TOKEN')."&phone=".$phoneNumbers."&type=".$type;
         //return $url;
         $request = new \GuzzleHttp\Psr7\Request('GET', $url);
         $res = $client->sendAsync($request)->wait();
@@ -67,7 +67,7 @@ class ServicesController extends Controller
             'multipart' => [
                 [
                     'name' => 'token',
-                    'contents' => $this->adminApiToken
+                    'contents' => env('SMARTSMS_API_TOKEN')
                 ],
                 [
                     'name' => 'sender',
@@ -91,7 +91,7 @@ class ServicesController extends Controller
                 ],
                 [
                     'name' => 'ref_id',
-                    'contents' => Auth::user()->id
+                    'contents' => 12
                 ],
                /* [
                     'name' => 'simserver_token',
@@ -106,11 +106,67 @@ class ServicesController extends Controller
                     'contents' => $current->addMinutes(2)
                 ]*/
             ]];
-        $url = $this->baseUrl."io/api/client/v1/sms/";
+        $url = env('SMARTSMS_BASEURL')."io/api/client/v1/sms/";
         $request = new \GuzzleHttp\Psr7\Request('POST', $url);
         $res = $client->sendAsync($request, $options)->wait();
         return json_decode($res->getBody()->getContents());
     }
+
+
+    public static function sendStaticSmartSms($senderId, $to, $message, $messageType, $refId ){
+
+        $client = new Client();
+        //$current = Carbon::now();
+        //return date("Y m h:i", strtotime("+30 minutes"));
+        $options = [
+            'multipart' => [
+                [
+                    'name' => 'token',
+                    'contents' => env('SMARTSMS_API_TOKEN')
+                ],
+                [
+                    'name' => 'sender',
+                    'contents' => $senderId
+                ],
+                [
+                    'name' => 'to',
+                    'contents' => $to
+                ],
+                [
+                    'name' => 'message',
+                    'contents' => $message
+                ],
+                [
+                    'name' => 'type',
+                    'contents' => $messageType
+                ],
+                [
+                    'name' => 'routing',
+                    'contents' => 3
+                ],
+                [
+                    'name' => 'ref_id',
+                    'contents' => 12
+                ],
+                /* [
+                     'name' => 'simserver_token',
+                     'contents' => 'simserver-token'
+                 ],
+                 [
+                     'name' => 'dlr_timeout',
+                     'contents' => 'dlr-timeout'
+                 ],
+                 [
+                     'name' => 'schedule',
+                     'contents' => $current->addMinutes(2)
+                 ]*/
+            ]];
+        $url = env('SMARTSMS_BASEURL')."io/api/client/v1/sms/";
+        $request = new \GuzzleHttp\Psr7\Request('POST', $url);
+        $res = $client->sendAsync($request, $options)->wait();
+        return json_decode($res->getBody()->getContents());
+    }
+
 
     public function getDeliveryReport(){
 
@@ -122,7 +178,7 @@ class ServicesController extends Controller
             'multipart' => [
                 [
                     'name' => 'token',
-                    'contents' => $this->adminApiToken
+                    'contents' => env('SMARTSMS_API_TOKEN')
                 ],
                 [
                     'name' => 'senderid',
@@ -134,7 +190,7 @@ class ServicesController extends Controller
                 ],
                 [
                     'name' => 'organisation',
-                    'contents' => Auth::user()->first_name
+                    'contents' => 'HeadFirst'
                 ],
                 [
                     'name' => 'regno',
@@ -145,7 +201,7 @@ class ServicesController extends Controller
                     'contents' => 'EFAB Mall Area 11 Garki Abuja, Nigeria'
                 ]
             ]];
-        $url = $this->baseUrl."io/api/client/v1/senderid/create/";
+        $url = env('SMARTSMS_BASEURL')."io/api/client/v1/senderid/create/";
         $request = new \GuzzleHttp\Psr7\Request('POST', $url);
         $res = $client->sendAsync($request, $options)->wait();
         return json_decode($res->getBody()->getContents());
