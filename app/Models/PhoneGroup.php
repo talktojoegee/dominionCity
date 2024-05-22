@@ -48,4 +48,9 @@ class PhoneGroup extends Model
     public static function getPhoneGroupById($id){
         return PhoneGroup::find($id);
     }
+
+
+    public static function getStaticPhoneGroupArrayById($ids){
+        return PhoneGroup::whereIn('id', $ids)->get();
+    }
 }

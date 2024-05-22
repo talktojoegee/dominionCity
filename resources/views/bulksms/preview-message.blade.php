@@ -124,23 +124,27 @@
 
                                 </div>
                                 <div class="card-footer text-right d-flex justify-content-center">
-                                    <a href="{{url()->previous()}}" class="btn btn-secondary btn-lg ml-3">Cancel</a>
-                                    @if( (Auth::user()->getUserAccount->sum('credit') - Auth::user()->getUserAccount->sum('debit')) < $cost )
-                                        <a href="{{route('top-up')}}" target="_blank" class=" ml-3 btn-primary btn-lg text-center">Top-up <i class="bx bxs-bank"></i> </a>
-                                    @else
-                                        <button type="submit" class=" ml-4 btn btn-primary w-25">Send Message <i class="bx bxs-right-arrow"></i> </button>
-                                        <input type="hidden" name="message" value="{{$message}}">
-                                        <input type="hidden" name="cost" value="{{$cost}}">
-                                        <input type="hidden" name="pages" value="{{$pages}}">
-                                        <input type="hidden" name="persons" value="{{$persons}}">
-                                        <input type="hidden" name="thirdParty" value="0">
-                                        <input type="hidden" name="phone_numbers" value="{{$phone_numbers}}">
-                                        <input type="hidden" name="type" value="{{$type}}">
-                                        <input type="hidden" name="dateTime" value="{{$dateTime}}">
-                                        <input type="hidden" name="frequency" value="{{$frequency}}">
-                                        <input type="hidden" name="timeLot" value="{{$timeLot}}">
-                                        <input type="hidden" name="recurring" value="{{$recurring}}">
-                                        <input type="hidden" name="phoneGroup" value="{{$phoneGroup}}">
+                                    <div class="btn-group">
+                                        <a href="{{url()->previous()}}" class="btn btn-secondary ml-3">Cancel</a>
+                                        @if( (Auth::user()->getUserAccount->sum('credit') - Auth::user()->getUserAccount->sum('debit')) < $cost )
+                                            <a href="{{route('top-up')}}" target="_blank" class=" ml-3 btn-primary text-center">Top-up <i class="bx bxs-bank"></i> </a>
+                                        @else
+                                            <button type="submit" class=" ml-4 btn btn-primary ">{{$type == 1 ? 'Send Message' : 'Schedule Message'}} <i class="bx bxs-right-arrow"></i> </button>
+                                            <input type="hidden" name="message" value="{{$message}}">
+                                            <input type="hidden" name="cost" value="{{$cost}}">
+                                            <input type="hidden" name="pages" value="{{$pages}}">
+                                            <input type="hidden" name="persons" value="{{$persons}}">
+                                            <input type="hidden" name="thirdParty" value="0">
+                                            <input type="hidden" name="phone_numbers" value="{{$phone_numbers}}">
+                                            <input type="hidden" name="type" value="{{$type}}">
+                                            <input type="hidden" name="dateTime" value="{{$dateTime}}">
+                                            <input type="hidden" name="frequency" value="{{$frequency}}">
+                                            <input type="hidden" name="timeLot" value="{{$timeLot}}">
+                                            <input type="hidden" name="recurring" value="{{$recurring}}">
+                                            @foreach($phoneGroup as $pg)
+                                                <input type="hidden" name="phoneGroup[]" value="{{$pg}}">
+                                            @endforeach
+                                    </div>
                                     @endif
                                 </div>
                         </form>

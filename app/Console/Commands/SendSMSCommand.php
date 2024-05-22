@@ -71,8 +71,12 @@ class SendSMSCommand extends Command
                          * if scheduled message is from a phone group
                          **/
                         if(!(is_null($message->phone_group))){
-                            $group = PhoneGroup::getPhoneGroupById($message->phone_group);
-                            $message->sent_to = $group->phone_numbers;
+                            $init_group = null;
+                            foreach(json_decode($message->phone_group) as $pg){
+                                $group = PhoneGroup::getPhoneGroupById($pg);
+                                $init_group .= $group->phone_numbers.",";
+                            }
+                            $message->sent_to = $init_group;
                             $message->save();
                         }
 
